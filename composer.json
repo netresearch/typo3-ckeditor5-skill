@@ -1,12 +1,12 @@
 {
   "name": "netresearch/agent-typo3-ckeditor5",
-  "description": "CKEditor 5 development patterns for TYPO3 v12+. This skill should be used when developing custom CKEditor 5 plugins for TYPO3, configuring RTE presets, integrating CKEditor with TYPO3 backend modules,",
+  "description": "Netresearch AI skill for CKEditor 5 development in TYPO3 v12+",
   "type": "ai-agent-skill",
   "license": "MIT",
   "authors": [
     {
       "name": "Netresearch DTT GmbH",
-      "email": "plugins@netresearch.de",
+      "email": "info@netresearch.de",
       "homepage": "https://www.netresearch.de/",
       "role": "Manufacturer"
     }
