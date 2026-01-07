@@ -29,13 +29,15 @@ jobs:
       - name: Create skill package
         run: |
           mkdir -p dist
-          cp SKILL.md dist/
+          # Copy skill files from new structure
+          cp skills/typo3-ckeditor5/SKILL.md dist/
           cp LICENSE dist/
-          [ -d "references" ] && cp -r references dist/
-          [ -d "scripts" ] && cp -r scripts dist/
-          [ -d "assets" ] && cp -r assets dist/
-          [ -d "templates" ] && cp -r templates dist/
-          [ -d "skills" ] && cp -r skills dist/
+          [ -d "skills/typo3-ckeditor5/references" ] && cp -r skills/typo3-ckeditor5/references dist/
+          [ -d "skills/typo3-ckeditor5/scripts" ] && cp -r skills/typo3-ckeditor5/scripts dist/
+          [ -d "skills/typo3-ckeditor5/assets" ] && cp -r skills/typo3-ckeditor5/assets dist/
+          [ -d "skills/typo3-ckeditor5/templates" ] && cp -r skills/typo3-ckeditor5/templates dist/
+          # Include plugin manifest
+          [ -d ".claude-plugin" ] && cp -r .claude-plugin dist/
           cd dist
           zip -r ../typo3-ckeditor5-${{ steps.version.outputs.version }}.zip .
           tar -czvf ../typo3-ckeditor5-${{ steps.version.outputs.version }}.tar.gz .
