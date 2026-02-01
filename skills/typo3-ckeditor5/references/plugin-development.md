@@ -928,6 +928,98 @@ describe('MyPluginCommand', () => {
 });
 ```
 
+## Consumable API - Preventing Duplicate Processing
+
+**Critical pattern for upcast converters** that need to prevent other converters (like GHS - General HTML Support) from processing the same element.
+
+### The Problem: Duplicate Elements
+
+When multiple converters can handle the same HTML element, you get duplicate output:
+
+```html
+<!-- Input: linked image -->
+<a href="/page"><img src="image.jpg"></a>
+
+<!-- Bug: GHS preserves <a> because your converter didn't consume it -->
+<a href="/page"><a href="/page"><img src="image.jpg"></a></a>
+```
+
+### The Solution: test() Before consume()
+
+**Always use `consumable.test()` before `consumable.consume()`** to prevent regressions:
+
+```javascript
+// ❌ BAD: Consume without testing - may silently fail
+conversion.for('upcast').add(dispatcher => {
+    dispatcher.on('element:a', (evt, data, conversionApi) => {
+        const { consumable, writer } = conversionApi;
+        const viewElement = data.viewItem;
+
+        // This might fail if another converter already consumed it!
+        consumable.consume(viewElement, { name: true });
+        // ... rest of conversion
+    });
+});
+
+// ✅ GOOD: Test first, then consume - prevents race conditions
+conversion.for('upcast').add(dispatcher => {
+    dispatcher.on('element:a', (evt, data, conversionApi) => {
+        const { consumable, writer } = conversionApi;
+        const viewElement = data.viewItem;
+
+        // Test if element is available for conversion
+        if (!consumable.test(viewElement, { name: true })) {
+            return; // Another converter already handled this
+        }
+
+        // Now safe to consume
+        consumable.consume(viewElement, { name: true });
+        // ... rest of conversion
+    });
+});
+```
+
+### Why test() Matters
+
+1. **Prevents silent failures**: `consume()` returns false if already consumed, but you might not check
+2. **Enables proper converter chaining**: Multiple converters can cooperate without conflicts
+3. **Avoids duplicate elements**: GHS and other catch-all converters won't process consumed elements
+4. **Race condition prevention**: Between `test()` and `consume()`, another converter could consume attributes (but not name)
+
+### Real-World Bug (Issue #565)
+
+```javascript
+// Bug: Early return without consuming caused GHS to create duplicate <a>
+if (!imgElement) {
+    return null; // <a> was NOT consumed - GHS preserves it!
+}
+
+// Fix: Always consume the element before returning
+if (!consumable.test(viewElement, { name: true }) ||
+    !consumable.test(imgElement, { name: true })) {
+    return null;
+}
+consumable.consume(viewElement, { name: true });
+consumable.consume(imgElement, { name: true });
+```
+
+### Testing for Pre-Consumed Elements
+
+Always test that your converter correctly handles pre-consumed elements:
+
+```javascript
+it('returns null when anchor is pre-consumed', () => {
+    const { anchor, img } = createLinkedImageView('https://example.com', {});
+
+    // Simulate another converter consuming the element first
+    conversionApi.consumable.consume(anchor, { name: true });
+
+    const result = linkedImageUpcastConverter(anchor, conversionApi);
+
+    expect(result).toBeNull();
+});
+```
+
 ## Best Practices
 
 1. **Separate Concerns**: Keep editing (schema, converters) and UI separate
@@ -937,3 +1029,4 @@ describe('MyPluginCommand', () => {
 5. **Performance**: Use efficient converters, avoid unnecessary re-renders
 6. **Testing**: Write unit tests for commands and converters
 7. **Documentation**: Document public API and configuration options
+8. **Consumable API**: Always `test()` before `consume()` in upcast converters

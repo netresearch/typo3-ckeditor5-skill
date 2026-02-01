@@ -437,6 +437,24 @@ final class RteProcessingListener
 
 ## Link Browser Integration
 
+### TypoLink Format
+
+**Critical:** TYPO3's TypoLink format has a specific parameter order:
+
+```
+url target class "title" additionalParams
+```
+
+Example: `t3://page?uid=1 _blank link-class "Link Title" &L=1&type=123`
+
+| Position | Parameter | Description |
+|----------|-----------|-------------|
+| 1 | URL | Link target (t3://page, https://, file:...) |
+| 2 | Target | Window target (_blank, _self, _top, _parent) |
+| 3 | Class | CSS class for the link element |
+| 4 | Title | Link title (must be quoted if contains spaces) |
+| 5 | Params | Additional URL parameters (&L=1&type=123) |
+
 ### TYPO3 Link Handler
 
 ```yaml
@@ -457,6 +475,81 @@ editor:
         - url
         - email
         - telephone
+```
+
+### FormEngine Link Browser (Not RTE-Specific)
+
+When building link browser URLs for custom image dialogs, use FormEngine-style parameters
+instead of RTE-specific adapters:
+
+```php
+// Generate link browser URL for image linking
+$linkBrowserUrl = $this->uriBuilder->buildUriFromRoute(
+    'wizard_link',
+    [
+        'P' => [
+            'table'                 => 'tt_content',
+            'uid'                   => 0, // No specific record; page context via pid
+            'pid'                   => $pid,
+            'field'                 => 'bodytext',
+            'formName'              => 'typo3image_linkform',
+            'itemName'              => 'typo3image_link',
+            'currentValue'          => $currentValue,
+            'currentSelectedValues' => $currentValue,
+            'params'                => [
+                'blindLinkOptions' => '',
+                'blindLinkFields'  => '',
+            ],
+        ],
+    ],
+);
+```
+
+### URL Parameter Handling
+
+When appending additional parameters to URLs, handle query strings and fragments correctly:
+
+```php
+/**
+ * Append params to URL, handling existing query strings and fragments.
+ *
+ * @param string $url    Base URL (may have query string and/or fragment)
+ * @param string $params Additional parameters (&L=1 or ?L=1 or L=1)
+ */
+public function getUrlWithParams(string $url, ?string $params): string
+{
+    if ($params === null || $params === '') {
+        return $url;
+    }
+
+    $fragment = '';
+
+    // Extract fragment if present (params go before fragment)
+    $fragmentPos = strpos($url, '#');
+    if ($fragmentPos !== false) {
+        $fragment = substr($url, $fragmentPos);
+        $url      = substr($url, 0, $fragmentPos);
+    }
+
+    // Normalize params based on existing query string
+    if (str_contains($url, '?')) {
+        // URL has query - ensure params start with &
+        if (str_starts_with($params, '?')) {
+            $params = '&' . substr($params, 1);
+        } elseif (!str_starts_with($params, '&')) {
+            $params = '&' . $params;
+        }
+    } else {
+        // URL has no query - ensure params start with ?
+        if (str_starts_with($params, '&')) {
+            $params = '?' . substr($params, 1);
+        } elseif (!str_starts_with($params, '?')) {
+            $params = '?' . $params;
+        }
+    }
+
+    return $url . $params . $fragment;
+}
 ```
 
 ### Custom Link Handler
