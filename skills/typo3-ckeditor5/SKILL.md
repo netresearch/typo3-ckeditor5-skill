@@ -1,6 +1,6 @@
 ---
 name: typo3-ckeditor5
-description: "Agent Skill: CKEditor 5 development for TYPO3 v12+. Use when developing custom plugins, configuring RTE presets, or migrating from CKEditor 4. By Netresearch."
+description: "Use when developing CKEditor 5 custom plugins for TYPO3 v12+, configuring RTE presets, or migrating from CKEditor 4."
 ---
 
 # TYPO3 CKEditor 5 Skill
