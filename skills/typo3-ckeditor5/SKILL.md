@@ -74,6 +74,20 @@ console.log('Backend response:', JSON.stringify(result, null, 2));
 const content = result.content || '';
 ```
 
+## jQuery Removal in TYPO3 Backend JS
+
+**CRITICAL:** TYPO3 backend JavaScript is dropping jQuery. The `rte_ckeditor` system extension already ships with zero jQuery dependencies. Backend JS is **NOT covered by the TYPO3 deprecation policy** -- jQuery can be removed from TYPO3 Core without a formal deprecation period.
+
+### Key Facts
+
+- `import $ from 'jquery'` in TYPO3 extensions resolves to the **TYPO3-provided** jQuery module, not a bundled copy
+- When TYPO3 removes its jQuery module, all extensions using that import will break immediately
+- CKEditor 5 plugins should use **native DOM APIs only** -- never jQuery
+
+### Migration Priority
+
+Remove jQuery from CKEditor-related code proactively. See `references/migration-guide.md` for the step-by-step migration order and `references/plugin-development.md` for native DOM patterns in dialog/iframe contexts.
+
 ## Migration Checklist
 
 - [ ] Audit existing CKEditor 4 plugins
@@ -82,6 +96,7 @@ const content = result.content || '';
 - [ ] Update YAML config from PageTSConfig
 - [ ] Test content rendering
 - [ ] **Verify JS property names match backend response** (if using AJAX)
+- [ ] **Remove jQuery dependency** (see jQuery Removal section)
 
 ## Verification
 

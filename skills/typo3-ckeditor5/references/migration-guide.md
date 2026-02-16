@@ -735,6 +735,98 @@ if (\TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['features']['myExtension.useCkeditor5'] = true;
 ```
 
+## jQuery Removal Migration
+
+TYPO3 backend JS is dropping jQuery. The `rte_ckeditor` system extension already has zero jQuery. Backend JS is **NOT** covered by the deprecation policy, so jQuery can vanish without notice. Migrate proactively.
+
+### Step-by-Step Migration Order (Lowest Risk First)
+
+Migrate in this order to keep each step small and testable:
+
+1. **`$.extend`** → `Object.assign()` or spread syntax `{ ...a, ...b }`
+2. **`$.each(collection, callback)`** → `for...of` / `Array.prototype.forEach`
+3. **`$.getJSON` / `$.ajax`** → `fetch()` with `response.ok` check
+4. **`$.Deferred()`** → `new Promise()` with extracted resolve/reject refs
+5. **Iframe DOM access** → `querySelector` + `contentDocument` + `dataset`
+6. **Dialog DOM builder** → `h(tag, className, parent)` helper (see plugin-development.md)
+7. **Remove `import $ from 'jquery'`** — only after all usages are gone
+
+### Critical: `$.each` to `for...of` and Variable Scoping
+
+**CRITICAL:** When converting `$.each(callback)` to `for...of`, `var` declarations inside the callback lose per-iteration function scope. You **must** convert `var` to `let`/`const` simultaneously, or closures that capture loop variables will break.
+
+```javascript
+// jQuery with var -- WORKS because $.each creates a new function scope per iteration
+$.each(items, function(i, item) {
+    var value = item.name;
+    setTimeout(function() {
+        console.log(value); // Correct: each iteration has its own 'value'
+    }, 100);
+});
+
+// BROKEN: for...of with var -- var is function-scoped, NOT block-scoped
+for (const item of items) {
+    var value = item.name;
+    setTimeout(function() {
+        console.log(value); // BUG: always logs last item's name
+    }, 100);
+}
+
+// CORRECT: for...of with let -- let is block-scoped
+for (const item of items) {
+    let value = item.name;       // or: const value = item.name;
+    setTimeout(function() {
+        console.log(value); // Correct: each iteration has its own 'value'
+    }, 100);
+}
+```
+
+### Event Migration: `mousewheel` → `wheel`
+
+The `mousewheel` event is non-standard (WebKit/IE). Use the standard `wheel` event:
+
+```javascript
+// Old (jQuery + mousewheel)
+$element.on('mousewheel', function(e) {
+    e.preventDefault();
+    zoom += e.originalEvent.wheelDelta > 0 ? step : -step;
+});
+
+// New (native + wheel) -- deltaY is INVERTED vs wheelDelta
+element.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    zoom += e.deltaY < 0 ? step : -step;
+}, { passive: false }); // passive: false required for preventDefault()
+```
+
+### jQuery `.data()` → `dataset`
+
+jQuery `.data('foo-bar')` auto-converts to camelCase. The native `dataset` API does the same:
+
+```javascript
+// jQuery
+$el.data('crop-data');       // reads data-crop-data attribute
+$el.data('crop-data', val);  // sets data-crop-data attribute
+
+// Native
+el.dataset.cropData;         // reads data-crop-data (auto camelCase)
+el.dataset.cropData = val;   // sets data-crop-data
+```
+
+### XSS Prevention
+
+Never use `insertAdjacentHTML` or `innerHTML` with interpolated values. This triggers CodeQL `js/xss-through-dom` alerts:
+
+```javascript
+// DANGEROUS
+container.insertAdjacentHTML('beforeend', `<span>${userValue}</span>`);
+
+// SAFE
+const span = document.createElement('span');
+span.textContent = userValue;
+container.appendChild(span);
+```
+
 ## Post-Migration Verification
 
 ### Verification Checklist

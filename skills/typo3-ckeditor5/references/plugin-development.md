@@ -1020,6 +1020,129 @@ it('returns null when anchor is pre-consumed', () => {
 });
 ```
 
+## Native DOM Patterns for CKEditor Plugin Dialogs
+
+CKEditor 5 plugins that open TYPO3 backend dialogs (e.g., image manipulation, link browser) must use native DOM -- never jQuery. TYPO3's `rte_ckeditor` sysext already has zero jQuery, and backend JS can drop jQuery without deprecation notice.
+
+### Dialog Element Access
+
+```javascript
+// jQuery (old)
+const $dialog = dialog.$el;
+$dialog.find('.my-class');
+
+// Native DOM (new)
+const dialogEl = dialog.el; // HTMLElement, not jQuery object
+dialogEl.querySelector('.my-class');
+```
+
+### DOM Builder Helper Pattern
+
+Replace jQuery DOM construction with a small helper:
+
+```javascript
+/**
+ * Create an element, set className, optionally append to parent.
+ */
+function h(tag, className, parent) {
+    const el = document.createElement(tag);
+    if (className) el.className = className;
+    if (parent) parent.appendChild(el);
+    return el;
+}
+
+// Usage
+const wrapper = h('div', 'image-manipulation');
+const row     = h('div', 'row', wrapper);
+const label   = h('label', 'form-label', row);
+label.textContent = 'Width';
+```
+
+**Security:** Never use `insertAdjacentHTML` with interpolated values -- this triggers CodeQL `js/xss-through-dom` alerts. Always use `createElement` + `textContent` for user-visible strings.
+
+### Promise Instead of $.Deferred
+
+```javascript
+// jQuery (old)
+const deferred = $.Deferred();
+// ... later
+deferred.resolve(result);
+return deferred.promise();
+
+// Native (new) -- extract resolve/reject for later use
+let resolveFn, rejectFn;
+const promise = new Promise((resolve, reject) => {
+    resolveFn = resolve;
+    rejectFn  = reject;
+});
+// ... later
+resolveFn(result);
+return promise;
+```
+
+### fetch() Instead of $.getJSON
+
+```javascript
+// jQuery (old)
+$.getJSON(url).done(data => { ... }).fail(err => { ... });
+
+// Native (new)
+const response = await fetch(url);
+if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
+}
+const data = await response.json();
+```
+
+### Event Listeners
+
+```javascript
+// jQuery (old)
+$element.on('click', handler);
+$element.off('click', handler);
+
+// Native (new)
+element.addEventListener('click', handler);
+element.removeEventListener('click', handler);
+```
+
+### Cross-Iframe DOM Access
+
+CKEditor image plugins often interact with iframes (e.g., image manipulation previews):
+
+```javascript
+// jQuery (old)
+const $iframe = dialog.$el.find('iframe');
+const $img = $iframe.contents().find('img');
+$img.data('crop-data');
+
+// Native (new)
+const iframe = dialogEl.querySelector('iframe');
+const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+const img = iframeDoc.querySelector('img');
+img.dataset.cropData; // .data('crop-data') → dataset.cropData (camelCase)
+```
+
+**Note:** jQuery `.data('foo-bar')` maps to `dataset.fooBar` -- jQuery auto-converts kebab-case to camelCase via the `dataset` API.
+
+### Mousewheel Event
+
+```javascript
+// jQuery (old)
+$element.on('mousewheel', function(e) {
+    e.preventDefault();
+    const delta = e.originalEvent.wheelDelta;
+    zoom += delta > 0 ? 0.1 : -0.1;
+});
+
+// Native (new) -- 'wheel' event with inverted deltaY
+element.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    // deltaY is POSITIVE for scroll-down (opposite of old wheelDelta)
+    zoom += e.deltaY < 0 ? 0.1 : -0.1;
+}, { passive: false }); // passive: false required to allow preventDefault()
+```
+
 ## Best Practices
 
 1. **Separate Concerns**: Keep editing (schema, converters) and UI separate
@@ -1030,3 +1153,4 @@ it('returns null when anchor is pre-consumed', () => {
 6. **Testing**: Write unit tests for commands and converters
 7. **Documentation**: Document public API and configuration options
 8. **Consumable API**: Always `test()` before `consume()` in upcast converters
+9. **No jQuery**: Use native DOM APIs exclusively -- see "Native DOM Patterns" above
