@@ -435,6 +435,36 @@ final class RteProcessingListener
 }
 ```
 
+### TypoScript parseFunc externalBlocks
+
+**Critical:** `externalBlocks` requires a TWO-part configuration:
+
+1. `externalBlocks = tag1, tag2` — comma-separated list of tag names to split on
+2. `externalBlocks.tag1 { ... }` — per-tag processing configuration
+
+Sub-properties for tags NOT in the list are **silently ignored** (common source of dead code).
+
+TYPO3 core default list: `article, aside, blockquote, div, dd, dl, footer, header, nav, ol, section, table, ul, pre, figure, figcaption`
+
+**`a` tags must NOT be in externalBlocks** — `externalBlocks` splits content by regex, so extracting `<a>` from inside `<p>` produces invalid HTML fragments. Use `tags.a` instead, which leverages depth-first processing: inner `tags.img` fires before outer `tags.a`, so the image is already processed when the link handler runs.
+
+### PHP DOMDocument::loadHTML() and UTF-8
+
+`DOMDocument::loadHTML()` defaults to **ISO-8859-1**, silently corrupting multi-byte UTF-8 characters (German umlauts ä/ö/ü/ß, French accents, etc.).
+
+```php
+// WRONG — corrupts UTF-8
+$dom->loadHTML('<div>' . $html . '</div>');
+
+// CORRECT — preserves UTF-8
+$dom->loadHTML(
+    '<?xml encoding="UTF-8"><div>' . $html . '</div>',
+    LIBXML_NONET | LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD,
+);
+```
+
+This affects any CKEditor image extension parsing RTE HTML content (figcaptions, alt text, link titles). PHP 8.4+ offers `Dom\HTMLDocument::createFromString()` as a modern alternative.
+
 ## Link Browser Integration
 
 ### TypoLink Format

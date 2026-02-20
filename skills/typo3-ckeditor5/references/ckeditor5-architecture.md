@@ -99,6 +99,17 @@ const canSetAttribute = schema.checkAttribute(element, 'myAttribute');
 'tableCell'      // Table cell
 ```
 
+### figcaption Content Model Limitations
+
+CKEditor 5's `ImageCaption` plugin registers `caption` with `allowContentOf: '$block'`, which includes inline text and inline elements but **NOT** `softBreak` (the internal model for `<br>`).
+
+**Consequences:**
+- `<br>` tags inside `<figcaption>` are stripped on save — both Shift+Enter and source-mode `<br>` fail
+- This is a CKEditor 5 core limitation, not an extension bug
+- Captions only wrap naturally based on container width
+
+**CSS scoping:** Use `figure.image figcaption` (not bare `figure figcaption`) to target only CKEditor-generated figures and avoid affecting other `<figcaption>` elements on the page.
+
 ## Conversion System
 
 ### Upcast (View → Model)
