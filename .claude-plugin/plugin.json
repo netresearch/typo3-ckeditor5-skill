@@ -6,9 +6,12 @@
   "license": "MIT",
   "author": {
     "name": "Netresearch DTT GmbH",
-    "email": "info@netresearch.de"
+    "url": "https://github.com/netresearch/typo3-ckeditor5-skill"
   },
   "skills": [
     "./skills/typo3-ckeditor5"
-  ]
+  ],
+  "support": {
+    "issues": "https://github.com/netresearch/typo3-ckeditor5-skill/issues"
+  }
 }
