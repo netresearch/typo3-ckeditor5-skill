@@ -2,7 +2,7 @@
   "name": "typo3-ckeditor5",
   "version": "1.2.4",
   "description": "CKEditor 5 development for TYPO3 v12+ with plugins and migration",
-  "repository": "https://www.netresearch.de",
+  "repository": "https://github.com/netresearch/typo3-ckeditor5-skill",
   "license": "MIT",
   "author": {
     "name": "Netresearch DTT GmbH",
