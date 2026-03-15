@@ -78,6 +78,34 @@ mechanical:
     severity: warning
     desc: "RTE config should not reference CKEditor 4 patterns"
 
+  # === PROCESSING SECTION IN RTE YAML ===
+  - id: CK-11
+    type: command
+    pattern: "find . -path '*/Configuration/RTE/*.yaml' -o -path '*/Configuration/RTE/*.yml' | head -1 | xargs grep -q 'processing:' 2>/dev/null || true"
+    severity: info
+    desc: "RTE YAML preset should have processing section (allowTags, allowAttributes)"
+
+  # === NO $.DEFERRED IN CKEditor CODE ===
+  - id: CK-12
+    type: command
+    pattern: "! find . -path '*/JavaScript/Ckeditor*' -name '*.js' -exec grep -l 'Deferred' {} + 2>/dev/null | head -1 | grep -q ."
+    severity: warning
+    desc: "CKEditor 5 plugins should use native Promise, not jQuery $.Deferred"
+
+  # === NO FETCH WITH JQUERY ===
+  - id: CK-13
+    type: command
+    pattern: "! find . -path '*/JavaScript/Ckeditor*' -name '*.js' -exec grep -l '\\$.getJSON\\|\\$.ajax\\|\\$.get\\|\\$.post' {} + 2>/dev/null | head -1 | grep -q ."
+    severity: warning
+    desc: "CKEditor 5 plugins should use native fetch(), not jQuery AJAX methods"
+
+  # === PLUGIN HAS SEPARATE EDITING AND UI ===
+  - id: CK-14
+    type: command
+    pattern: "find . -path '*/JavaScript/Ckeditor*' -name '*editing*' -o -path '*/JavaScript/Ckeditor*' -name '*Editing*' | head -1 | grep -q . 2>/dev/null || true"
+    severity: info
+    desc: "CKEditor 5 plugins should separate Editing and UI concerns into separate files"
+
 llm_reviews:
   - id: CK-20
     domain: ckeditor5
