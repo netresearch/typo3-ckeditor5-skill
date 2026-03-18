@@ -1,6 +1,6 @@
 ---
 name: typo3-ckeditor5
-description: "Use when developing CKEditor 5 custom plugins for TYPO3 v12+, configuring RTE presets, or migrating from CKEditor 4."
+description: "Use when developing CKEditor 5 custom plugins for TYPO3 v12+, configuring RTE presets, migrating from CKEditor 4, customizing toolbars, or fixing rich text editing issues. Also triggers on: CKE5, RTE config, YAML preset, editor plugin, jQuery removal, backend JS."
 ---
 
 # TYPO3 CKEditor 5 Skill
