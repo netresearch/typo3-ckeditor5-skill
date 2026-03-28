@@ -1075,8 +1075,14 @@ const promise = new Promise((resolve, reject) => {
     resolveFn = resolve;
     rejectFn  = reject;
 });
-// ... later
-resolveFn(result);
+
+// ... later, in a callback or async operation:
+if (operationSuccessful) {
+    resolveFn(result);
+} else {
+    rejectFn(error);
+}
+
 return promise;
 ```
 
@@ -1087,11 +1093,16 @@ return promise;
 $.getJSON(url).done(data => { ... }).fail(err => { ... });
 
 // Native (new)
-const response = await fetch(url);
-if (!response.ok) {
-    throw new Error(`HTTP ${response.status}`);
+try {
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+    }
+    const data = await response.json();
+    // ... do something with data
+} catch (error) {
+    // ... handle network errors and other issues
 }
-const data = await response.json();
 ```
 
 ### Event Listeners

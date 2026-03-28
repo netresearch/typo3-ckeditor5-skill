@@ -8,6 +8,10 @@
     "name": "Netresearch DTT GmbH",
     "url": "https://www.netresearch.de"
   },
+  "support": {
+    "issues": "https://github.com/netresearch/typo3-ckeditor5-skill/issues",
+    "source": "https://github.com/netresearch/typo3-ckeditor5-skill"
+  },
   "skills": [
     "./skills/typo3-ckeditor5"
   ]
