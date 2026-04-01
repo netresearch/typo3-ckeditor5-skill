@@ -11,14 +11,14 @@ CKEditor 5 integration patterns for TYPO3: custom plugins, configuration, and mi
 
 - **Architecture**: Plugin system, schema/conversion, commands, UI components
 - **TYPO3 Integration**: YAML configuration, plugin registration, content elements
-- **Migration**: CKEditor 4→5, plugin conversion, data migration
+- **Migration**: CKEditor 4->5 complete rewrite (no compatibility layer exists)
 
 ## Reference Files
 
-- `references/ckeditor5-architecture.md` - Core concepts
+- `references/ckeditor5-architecture.md` - Core MVC, schema, conversion
 - `references/typo3-integration.md` - TYPO3-specific patterns
 - `references/plugin-development.md` - Custom plugin guide
-- `references/migration-guide.md` - CKEditor 4→5 migration
+- `references/migration-guide.md` - CKEditor 4->5 migration
 
 ## Quick Reference
 
@@ -31,72 +31,60 @@ $GLOBALS['TYPO3_CONF_VARS']['SYS']['ckeditor5']['plugins']['my-plugin'] = [
 ];
 ```
 
-### Plugin Structure
+### Plugin Structure (Editing/UI Split Required)
 
 ```
 packages/my-plugin/src/
-├── myplugin.js           # Main plugin (requires Editing + UI)
+├── myplugin.js           # Main: requires Editing + UI
 ├── mypluginediting.js    # Schema, converters, commands
-├── mypluginui.js         # Toolbar buttons, dropdowns
-└── myplugincommand.js    # Command implementation
+├── mypluginui.js         # Toolbar buttons (ButtonView, componentFactory)
+└── myplugincommand.js    # Command: execute() + refresh()
 ```
 
-## Backend Integration (nr-llm)
+### Key Patterns
 
-When integrating CKEditor plugins with TYPO3 backend services (like nr-llm for AI features):
+```javascript
+// Schema: always register with allowIn/allowAttributes
+schema.register('myElement', { inheritAllFrom: '$block', allowAttributes: ['type'] });
 
-### Response Property Names
+// Converters: both upcast + downcast required
+conversion.for('upcast').elementToElement({ view: { name: 'div', classes: 'my-el' }, model: 'myElement' });
+conversion.for('downcast').elementToElement({ model: 'myElement', view: 'div' });
 
-**CRITICAL:** Frontend JavaScript must use the exact property names returned by the backend.
+// Command: must implement execute() AND refresh()
+class MyCommand extends Command {
+  refresh() { this.isEnabled = /* check model state */; }
+  execute() { this.editor.model.change(writer => { /* ... */ }); }
+}
+```
+
+## jQuery Removal (Critical)
+
+TYPO3 backend JS is dropping jQuery without deprecation period. CKEditor 5 plugins must use native APIs only:
+- `querySelector`/`querySelectorAll` instead of `$()`
+- `fetch()` + `async/await` instead of `$.ajax`/`$.getJSON`
+- `Promise` instead of `$.Deferred`
+
+## Backend Integration
+
+**Property name mismatch is the #1 bug.** Frontend JS must match exact backend response property names.
 
 ```javascript
 // Backend returns: { content: "...", model: "...", usage: {...} }
-
-// WRONG - will be undefined
-const text = result.completion;  // Backend doesn't return 'completion'
-
-// CORRECT - matches backend response
-const text = result.content;
+const text = result.content;  // CORRECT (not result.completion)
 ```
 
-**Real-world bug from t3x-cowriter:**
-- Backend `CompleteResponse::success()` returned `content` property
-- Frontend used `result.completion` (wrong property name)
-- Fix: Changed to `result.content`
+## Migration (CKE4 -> CKE5)
 
-### Verification Pattern
+CKEditor 5 is a complete rewrite -- no compatibility layer. Migration requires full plugin rewrite:
 
-```javascript
-// Log response structure during development
-console.log('Backend response:', JSON.stringify(result, null, 2));
-
-// Then use correct property
-const content = result.content || '';
-```
-
-## jQuery Removal in TYPO3 Backend JS
-
-**CRITICAL:** TYPO3 backend JavaScript is dropping jQuery. The `rte_ckeditor` system extension already ships with zero jQuery dependencies. Backend JS is **NOT covered by the TYPO3 deprecation policy** -- jQuery can be removed from TYPO3 Core without a formal deprecation period.
-
-### Key Facts
-
-- `import $ from 'jquery'` in TYPO3 extensions resolves to the **TYPO3-provided** jQuery module, not a bundled copy
-- When TYPO3 removes its jQuery module, all extensions using that import will break immediately
-- CKEditor 5 plugins should use **native DOM APIs only** -- never jQuery
-
-### Migration Priority
-
-Remove jQuery from CKEditor-related code proactively. See `references/migration-guide.md` for the step-by-step migration order and `references/plugin-development.md` for native DOM patterns in dialog/iframe contexts.
-
-## Migration Checklist
-
-- [ ] Audit existing CKEditor 4 plugins
-- [ ] Map features to CKEditor 5 equivalents
-- [ ] Convert to class-based architecture
-- [ ] Update YAML config from PageTSConfig
-- [ ] Test content rendering
-- [ ] **Verify JS property names match backend response** (if using AJAX)
-- [ ] **Remove jQuery dependency** (see jQuery Removal section)
+- [ ] Audit CKE4 plugins, map features to CKE5 equivalents
+- [ ] Convert `CKEDITOR.plugins.add()` to class-based `extends Plugin`
+- [ ] Replace `editor.widgets.add()` with schema + converters + commands
+- [ ] Convert PageTSConfig to YAML preset (`Configuration/RTE/*.yaml`)
+- [ ] Use ES6 modules (no AMD/CommonJS)
+- [ ] Remove all jQuery dependencies
+- [ ] Verify backend response property names match frontend usage
 
 ## Verification
 
