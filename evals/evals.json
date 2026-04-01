@@ -1,33 +1,386 @@
 [
   {
     "name": "create-ckeditor5-plugin",
-    "prompt": "Create a custom CKEditor 5 plugin",
+    "prompt": "Create a custom CKEditor 5 plugin for TYPO3 that adds a 'highlight' button to mark selected text with a custom CSS class.",
     "assertions": [
-      {
-        "type": "tool_use",
-        "tool": "Write",
-        "description": "Creates plugin source files"
-      },
       {
         "type": "content_contains",
         "value": "Plugin",
-        "description": "Implements CKEditor 5 Plugin class"
+        "description": "Uses CKEditor 5 Plugin base class"
+      },
+      {
+        "type": "content_contains",
+        "value": "extends Plugin",
+        "description": "Extends Plugin class correctly"
+      },
+      {
+        "type": "content_contains",
+        "value": "pluginName",
+        "description": "Defines static pluginName property"
       }
     ]
   },
   {
-    "name": "migrate-rte-config",
-    "prompt": "Migrate RTE config from CKEditor 4",
+    "name": "plugin-editing-ui-split",
+    "prompt": "Show me the correct file structure and class separation for a CKEditor 5 plugin with separate Editing and UI concerns.",
     "assertions": [
       {
-        "type": "tool_use",
-        "tool": "Read",
-        "description": "Reads existing RTE configuration"
+        "type": "content_contains",
+        "value": "Editing",
+        "description": "Separates editing concern"
       },
       {
         "type": "content_contains",
-        "value": "YAML",
-        "description": "Produces YAML-based CKEditor 5 config"
+        "value": "UI",
+        "description": "Separates UI concern"
+      },
+      {
+        "type": "content_contains",
+        "value": "requires",
+        "description": "Main plugin requires Editing and UI sub-plugins"
+      }
+    ]
+  },
+  {
+    "name": "schema-registration",
+    "prompt": "How do I register a custom model element with schema in CKEditor 5 for a 'callout' block element?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "schema.register",
+        "description": "Uses schema.register for model elements"
+      },
+      {
+        "type": "content_contains",
+        "value": "allowIn",
+        "description": "Defines allowIn for element placement"
+      }
+    ]
+  },
+  {
+    "name": "upcast-downcast-converters",
+    "prompt": "Write upcast and downcast converters for a custom CKEditor 5 element that converts between a model element 'infoBox' and a <div class=\"info-box\"> in the view.",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "upcast",
+        "description": "Implements upcast (view-to-model) converter"
+      },
+      {
+        "type": "content_contains",
+        "value": "downcast",
+        "description": "Implements downcast (model-to-view) converter"
+      },
+      {
+        "type": "content_contains",
+        "value": "elementToElement",
+        "description": "Uses elementToElement conversion helper"
+      }
+    ]
+  },
+  {
+    "name": "command-implementation",
+    "prompt": "Implement a CKEditor 5 Command class that toggles a 'highlight' model attribute on the selected text.",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "Command",
+        "description": "Extends Command base class"
+      },
+      {
+        "type": "content_contains",
+        "value": "execute",
+        "description": "Implements execute method"
+      },
+      {
+        "type": "content_contains",
+        "value": "refresh",
+        "description": "Implements refresh method for state"
+      }
+    ]
+  },
+  {
+    "name": "rte-yaml-preset",
+    "prompt": "Create a TYPO3 RTE YAML preset file that configures CKEditor 5 with heading, bold, italic, link, and list toolbar items.",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "editor:",
+        "description": "Uses editor: top-level key"
+      },
+      {
+        "type": "content_contains",
+        "value": "toolbar:",
+        "description": "Configures toolbar section"
+      },
+      {
+        "type": "content_contains",
+        "value": "items:",
+        "description": "Lists toolbar items"
+      },
+      {
+        "type": "content_contains",
+        "value": "heading",
+        "description": "Includes heading in toolbar"
+      }
+    ]
+  },
+  {
+    "name": "rte-processing-config",
+    "prompt": "How do I configure HTML processing rules in a TYPO3 CKEditor 5 YAML preset to allow custom data attributes and specific HTML tags?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "processing:",
+        "description": "Uses processing section in YAML"
+      },
+      {
+        "type": "content_contains",
+        "value": "allowTags",
+        "description": "Configures allowTags for HTML sanitization"
+      }
+    ]
+  },
+  {
+    "name": "plugin-registration-ext-localconf",
+    "prompt": "How do I register a custom CKEditor 5 plugin in TYPO3's ext_localconf.php?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "TYPO3_CONF_VARS",
+        "description": "Uses TYPO3_CONF_VARS global"
+      },
+      {
+        "type": "content_contains",
+        "value": "ckeditor5",
+        "description": "Registers under ckeditor5 config key"
+      },
+      {
+        "type": "content_contains",
+        "value": "entryPoint",
+        "description": "Specifies entryPoint for plugin JS"
+      }
+    ]
+  },
+  {
+    "name": "rte-preset-registration",
+    "prompt": "Show how to register a custom RTE preset YAML file in TYPO3 so it can be selected in the backend.",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "RTE",
+        "description": "References RTE configuration"
+      },
+      {
+        "type": "content_contains",
+        "value": "Presets",
+        "description": "Uses Presets key for registration"
+      },
+      {
+        "type": "content_contains",
+        "value": "EXT:",
+        "description": "Uses EXT: path notation"
+      }
+    ]
+  },
+  {
+    "name": "migrate-cke4-plugin-to-cke5",
+    "prompt": "I have a CKEditor 4 plugin that uses CKEDITOR.plugins.add and editor.widgets.add. How do I migrate it to CKEditor 5?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "Plugin",
+        "description": "Mentions CKE5 Plugin class"
+      },
+      {
+        "type": "content_contains",
+        "value": "schema",
+        "description": "Mentions schema registration as replacement"
+      },
+      {
+        "type": "content_contains",
+        "value": "class",
+        "description": "Mentions class-based architecture conversion"
+      }
+    ]
+  },
+  {
+    "name": "migrate-rte-config-tsconfig-to-yaml",
+    "prompt": "Migrate this CKEditor 4 PageTSConfig RTE configuration to CKEditor 5 YAML format: RTE.default.editor.config.toolbar = ['Bold','Italic','Link']",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "yaml",
+        "description": "Produces YAML-based configuration"
+      },
+      {
+        "type": "content_contains",
+        "value": "toolbar",
+        "description": "Maps toolbar configuration"
+      },
+      {
+        "type": "content_contains",
+        "value": "bold",
+        "description": "Converts toolbar item names to lowercase CKE5 format"
+      }
+    ]
+  },
+  {
+    "name": "toolbar-grouping-separators",
+    "prompt": "How do I group toolbar items with separators and line breaks in a CKEditor 5 TYPO3 YAML preset?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "|",
+        "description": "Uses pipe separator for toolbar groups"
+      },
+      {
+        "type": "content_contains",
+        "value": "items",
+        "description": "Configures items array"
+      }
+    ]
+  },
+  {
+    "name": "jquery-removal-ckeditor",
+    "prompt": "Our CKEditor 5 plugin uses jQuery for DOM manipulation and AJAX. How should we replace it?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "native",
+        "description": "Recommends native DOM APIs"
+      },
+      {
+        "type": "content_contains",
+        "value": "fetch",
+        "description": "Recommends native fetch() for AJAX"
+      },
+      {
+        "type": "content_contains",
+        "value": "querySelector",
+        "description": "Recommends querySelector over jQuery selectors"
+      }
+    ]
+  },
+  {
+    "name": "jquery-deferred-to-promise",
+    "prompt": "Replace jQuery $.Deferred and $.ajax patterns with modern native JavaScript in a TYPO3 CKEditor 5 plugin context.",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "Promise",
+        "description": "Uses native Promise"
+      },
+      {
+        "type": "content_contains",
+        "value": "fetch",
+        "description": "Uses native fetch API"
+      },
+      {
+        "type": "content_contains",
+        "value": "async",
+        "description": "Uses async/await pattern"
+      }
+    ]
+  },
+  {
+    "name": "backend-response-property-names",
+    "prompt": "My CKEditor 5 plugin calls a TYPO3 backend endpoint. The response uses result.completion but it returns undefined. What's wrong?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "content",
+        "description": "Identifies correct property name is 'content'"
+      },
+      {
+        "type": "content_contains",
+        "value": "property",
+        "description": "Identifies property name mismatch"
+      }
+    ]
+  },
+  {
+    "name": "es6-module-syntax",
+    "prompt": "What module format should CKEditor 5 plugins use in TYPO3? Can I use require() or AMD?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "ES6",
+        "description": "Specifies ES6 module syntax"
+      },
+      {
+        "type": "content_contains",
+        "value": "import",
+        "description": "Uses import/export syntax"
+      }
+    ]
+  },
+  {
+    "name": "toolbar-button-ui",
+    "prompt": "How do I add a custom toolbar button with an icon and tooltip in CKEditor 5 for TYPO3?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "ButtonView",
+        "description": "Uses ButtonView for toolbar buttons"
+      },
+      {
+        "type": "content_contains",
+        "value": "componentFactory",
+        "description": "Registers via editor.ui.componentFactory"
+      }
+    ]
+  },
+  {
+    "name": "content-element-rte-field",
+    "prompt": "How do I configure a TYPO3 content element's bodytext field to use a specific CKEditor 5 RTE preset?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "richtext",
+        "description": "References richtext column type or TCA config"
+      },
+      {
+        "type": "content_contains",
+        "value": "preset",
+        "description": "Configures preset selection"
+      }
+    ]
+  },
+  {
+    "name": "dropdown-ui-component",
+    "prompt": "Create a CKEditor 5 dropdown UI component that lets users select from predefined CSS classes to apply to selected text in TYPO3.",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "DropdownView",
+        "description": "Uses DropdownView or dropdown utilities"
+      },
+      {
+        "type": "content_contains",
+        "value": "componentFactory",
+        "description": "Registers via componentFactory"
+      },
+      {
+        "type": "content_contains",
+        "value": "execute",
+        "description": "Connects to a command execution"
+      }
+    ]
+  },
+  {
+    "name": "verify-ckeditor5-setup",
+    "prompt": "How do I verify that my TYPO3 extension's CKEditor 5 setup is correct?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "verify",
+        "description": "References verification process"
+      },
+      {
+        "type": "content_contains",
+        "value": "ext_localconf",
+        "description": "Checks plugin registration"
       }
     ]
   }
