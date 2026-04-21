@@ -843,3 +843,33 @@ container.appendChild(span);
 - [ ] Frontend output valid HTML
 - [ ] Accessibility compliance maintained
 - [ ] Performance acceptable
+
+---
+
+## CKEditor 5 version timeline in TYPO3
+
+| TYPO3 | CKEditor 5 | Notes |
+|---|---|---|
+| v12.4 LTS | 41.x–42.x | Initial CKE5 integration |
+| v13.4 LTS | 41.x–42.x | Feature parity with v12 |
+| **v14.3 LTS** | **47.0.0** | Major jump |
+
+### v14 changes to watch
+
+- **Context-aware theming (dark/light) enabled by default** (Breaking [#106964](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/14.0/Breaking-106964-MakeCkeditorContextAwareByDefault.html)). If you ship a custom RTE preset with hardcoded CSS colors, they may now clash with the backend theme. Prefer CSS custom properties referencing `--typo3-editor-*` tokens.
+- **CKEditor 5 v47** brings the Collaboration / Track Changes / Import-from-Word plugin architecture to maturity; none are bundled in TYPO3 core, but if you vendor them, match the 47.x line.
+- **PSR-14 `AfterRichtextConfigurationPreparedEvent`** (Feature [#107322](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/14.0/Feature-107322-IntroduceAfterRichtextConfigurationPreparedEventAfterRteConfigurationIsPrepared.html)) replaces the informal hook previously used to tweak RTE config at runtime.
+- **RTE in EXT:form** (Feature [#108966](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/14.2/Feature-108966-AddCKEditor5SupportForEXTformRichtextElement.html), v14.2+) — CKE5 is now available inside Form Framework `richtext` elements. RTE presets used there must satisfy form-context content rules.
+
+### Jump from v13 (41/42) to v14 (47)
+
+Breaking API changes accumulate across CKE5 41 → 47. Consult the [CKEditor 5 migration docs](https://ckeditor.com/docs/ckeditor5/latest/updating/guides/migration.html) for each major between your source and target. The [TYPO3 Core CKEditor 5 Integration chapter](https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/ApiOverview/Rte/ConfigurationReference/Index.html) documents the subset used by core plugins and preset YAML conventions.
+
+### Verification steps for a v14 RTE preset
+
+- [ ] RTE renders without console errors in both light and dark backend modes
+- [ ] Preset YAML loads without warnings under v14's schema validation
+- [ ] Custom plugins declare compatibility with CKEditor 5 v47 API
+- [ ] Inline and block widgets respect the new `editor.editing.view.scrollToTheSelection()` behavior
+- [ ] `AfterRichtextConfigurationPreparedEvent` (PSR-14) listeners replace any prior use of the older `BeforeRichtextConfigurationPreparedEvent` or custom `getConfiguration` overrides
+- [ ] EXT:form integration tested if the preset is used in forms
