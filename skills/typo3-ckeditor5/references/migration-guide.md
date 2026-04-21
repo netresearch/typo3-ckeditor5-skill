@@ -863,7 +863,7 @@ container.appendChild(span);
 
 ### Jump from v13 (41/42) to v14 (47)
 
-Breaking API changes accumulate across CKE5 41 → 47. Consult the [CKEditor 5 migration docs](https://ckeditor.com/docs/ckeditor5/latest/updating/guides/migration.html) for each major between your source and target. TYPO3 Core Styleguide covers the subset used by core plugins.
+Breaking API changes accumulate across CKE5 41 → 47. Consult the [CKEditor 5 migration docs](https://ckeditor.com/docs/ckeditor5/latest/updating/guides/migration.html) for each major between your source and target. The [TYPO3 Core CKEditor 5 Integration chapter](https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/ApiOverview/Rte/ConfigurationReference/Index.html) documents the subset used by core plugins and preset YAML conventions.
 
 ### Verification steps for a v14 RTE preset
 
@@ -871,5 +871,5 @@ Breaking API changes accumulate across CKE5 41 → 47. Consult the [CKEditor 5 m
 - [ ] Preset YAML loads without warnings under v14's schema validation
 - [ ] Custom plugins declare compatibility with CKEditor 5 v47 API
 - [ ] Inline and block widgets respect the new `editor.editing.view.scrollToTheSelection()` behavior
-- [ ] `AfterRichtextConfigurationPreparedEvent` listeners replace any prior `prepareConfiguration` hooks
+- [ ] `AfterRichtextConfigurationPreparedEvent` (PSR-14) listeners replace any prior use of the older `BeforeRichtextConfigurationPreparedEvent` or custom `getConfiguration` overrides
 - [ ] EXT:form integration tested if the preset is used in forms
