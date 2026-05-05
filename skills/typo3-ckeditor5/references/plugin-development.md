@@ -139,6 +139,11 @@ export default class MyPluginEditing extends Plugin {
         // --- Block Element Converters ---
 
         // Upcast: view -> model
+        // NOTE: `viewElement` is a CKE5 view element, NOT a DOM element.
+        // Use `getAttribute()` here — `viewElement.dataset` does not exist
+        // and SonarCloud's `javascript:S7761` is a false positive on these
+        // callsites. See `ckeditor5-architecture.md` ->
+        // "Pitfall: View Elements Are Not DOM Elements".
         conversion.for('upcast').elementToElement({
             view: {
                 name: 'div',
