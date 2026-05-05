@@ -292,9 +292,9 @@ Inside upcast/downcast converter callbacks, the element you receive is a
 `getAttribute(key)` method that *mirrors the DOM API by name only* — it
 reads from an internal attribute map. Crucially, view elements have:
 
-- `getAttribute(key)` / `hasAttribute(key)` (return strings / booleans)
+- `getAttribute(key)` / `hasAttribute(key)` (returns strings / booleans)
 - NO `.dataset` property
-- NO `.classList` (use `getAttribute('class')` and parse, or use the
+- NO `.classList` (use `hasClass()` / `getClasses()`, or use the
   view writer's `addClass` / `removeClass` for downcast)
 
 Do NOT apply DOM-targeted lint rules (e.g. SonarCloud's
