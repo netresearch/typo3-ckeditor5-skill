@@ -3,9 +3,9 @@
 For plugin scaffolding (class structure, schema, converters, commands,
 toolbar UI), see the
 [CKEditor 5 plugin development guide](https://ckeditor.com/docs/ckeditor5/latest/framework/plugins/plugins.html)
-or the Quick Reference in `SKILL.md`. Before writing upcast/downcast
-converters, also read `ckeditor5-architecture.md` -> "Pitfall: View
-Elements Are Not DOM Elements" -- SonarCloud's `javascript:S7761` is a
+or the Quick Reference in [SKILL.md](../SKILL.md). Before writing upcast/downcast
+converters, also read [ckeditor5-architecture.md](ckeditor5-architecture.md#pitfall-view-elements-are-not-dom-elements)
+("Pitfall: View Elements Are Not DOM Elements") -- SonarCloud's `javascript:S7761` is a
 false positive on `getAttribute('data-*')` calls inside converter
 callbacks. This file covers TYPO3-specific plugin wiring and other
 gotchas found building CKE5 plugins for TYPO3.
