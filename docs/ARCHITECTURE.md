@@ -11,9 +11,9 @@ The typo3-ckeditor5-skill is an AI agent skill that provides expert guidance for
 - **SKILL.md**: Entry point loaded by AI agents. Contains trigger patterns, procedural instructions for CKEditor 5 development within TYPO3.
 - **checkpoints.yaml**: Verification checkpoints for validating CKEditor 5 integration correctness.
 - **references/**: Standalone reference guides:
-  - `ckeditor5-architecture.md` -- CKEditor 5 core concepts (plugin system, schema, conversion, commands)
+  - `ckeditor5-architecture.md` -- CKEditor 5 gotchas that diverge from public docs (figcaption content model, view-vs-DOM element pitfall)
   - `typo3-integration.md` -- TYPO3-specific patterns (YAML presets, plugin registration, content elements)
-  - `plugin-development.md` -- Complete guide for creating custom CKEditor 5 plugins
+  - `plugin-development.md` -- TYPO3 plugin wiring (bundling, registration, YAML config) plus consumable-API and jQuery-removal gotchas
   - `migration-guide.md` -- CKEditor 4 to 5 migration strategies and patterns
 
 ### Verification Scripts (`skills/typo3-ckeditor5/scripts/`)

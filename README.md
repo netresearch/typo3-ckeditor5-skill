@@ -82,9 +82,9 @@ Example queries:
 typo3-ckeditor5-skill/
 ├── SKILL.md                              # Skill metadata and core patterns
 ├── references/
-│   ├── ckeditor5-architecture.md         # CKEditor 5 core concepts
+│   ├── ckeditor5-architecture.md         # CKEditor 5 gotchas (figcaption, view vs DOM)
 │   ├── typo3-integration.md              # TYPO3-specific integration patterns
-│   ├── plugin-development.md             # Custom plugin creation guide
+│   ├── plugin-development.md             # TYPO3 plugin wiring and gotchas
 │   └── migration-guide.md                # CKEditor 4 to 5 migration
 └── scripts/
     └── verify-ckeditor5.sh               # Verification script
