@@ -15,9 +15,9 @@ CKEditor 5 integration patterns for TYPO3: custom plugins, configuration, and mi
 
 ## Reference Files
 
-- `references/ckeditor5-architecture.md` - Core MVC, schema, conversion
+- `references/ckeditor5-architecture.md` - Gotchas: figcaption, view-vs-DOM elements
 - `references/typo3-integration.md` - TYPO3-specific patterns
-- `references/plugin-development.md` - Custom plugin guide
+- `references/plugin-development.md` - TYPO3 wiring, consumable API, jQuery-free dialogs
 - `references/migration-guide.md` - CKEditor 4->5 migration
 
 ## Quick Reference
