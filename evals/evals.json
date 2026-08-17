@@ -5,20 +5,32 @@
     "assertions": [
       {
         "type": "content_contains",
-        "value": "Plugin",
-        "description": "Uses CKEditor 5 Plugin base class"
-      },
-      {
-        "type": "content_contains",
-        "value": "extends Plugin",
-        "description": "Extends Plugin class correctly"
-      },
-      {
-        "type": "content_contains",
         "value": "pluginName",
-        "description": "Defines static pluginName property"
+        "description": "Structural anchor: the plugin class declares a static pluginName"
+      },
+      {
+        "type": "content_contains",
+        "value": "entryPoint",
+        "description": "Registers the built JS with TYPO3 via the ckeditor5 plugins entryPoint -- a plain CKEditor 5 answer stops at the class and the button never loads"
+      },
+      {
+        "type": "content_regex",
+        "value": "Configuration/RTE|\\.yaml|preset",
+        "description": "Adds the toolbar item to an RTE preset -- without it the plugin is loaded and the button is still not in any toolbar"
+      },
+      {
+        "type": "content_regex",
+        "value": "(?i)(querySelector|fetch\\(|addEventListener|no jquery|without jquery|native)",
+        "description": "Uses native browser APIs, because TYPO3 backend JS is dropping jQuery without a deprecation period"
       }
-    ]
+    ],
+    "samples": {
+      "passing": "Create MyHighlight extends Plugin with static pluginName, split into Editing and UI classes. Register the built file in ext_localconf.php under $GLOBALS['TYPO3_CONF_VARS']['SYS']['ckeditor5']['plugins']['my-highlight']['entryPoint'], then add the toolbar item to your preset in Configuration/RTE/MyPreset.yaml, otherwise the plugin loads and the button appears nowhere. In the UI class use native DOM APIs — querySelector and addEventListener — since TYPO3 backend JS is dropping jQuery.",
+      "failing": [
+        "export default class MyHighlight extends Plugin { static get pluginName() { return 'MyHighlight'; } init() { /* add the button */ } } — drop that file into your extension and the button appears in the editor.",
+        "Use CKEDITOR.plugins.add('highlight', { init: function (editor) { editor.addCommand(...) } }) and load it with $.getScript."
+      ]
+    }
   },
   {
     "name": "plugin-editing-ui-split",
@@ -188,19 +200,19 @@
     "prompt": "I have a CKEditor 4 plugin that uses CKEDITOR.plugins.add and editor.widgets.add. How do I migrate it to CKEditor 5?",
     "assertions": [
       {
-        "type": "content_contains",
-        "value": "Plugin",
-        "description": "Mentions CKE5 Plugin class"
+        "type": "content_regex",
+        "value": "(?i)(no|without) (backward |backwards )?compat|complete rewrite|full rewrite|rewritten",
+        "description": "States that no compatibility layer exists, so this is a rewrite rather than a port"
+      },
+      {
+        "type": "content_regex",
+        "value": "toWidget|ckeditor5-widget|Widget",
+        "description": "Maps editor.widgets.add onto the CKE5 Widget plugin and toWidget rather than leaving the widget half unanswered"
       },
       {
         "type": "content_contains",
-        "value": "schema",
-        "description": "Mentions schema registration as replacement"
-      },
-      {
-        "type": "content_contains",
-        "value": "class",
-        "description": "Mentions class-based architecture conversion"
+        "value": "schema.register",
+        "description": "Names the concrete replacement for the widget definition"
       }
     ]
   },
@@ -374,13 +386,18 @@
     "assertions": [
       {
         "type": "content_contains",
-        "value": "verify",
-        "description": "References verification process"
+        "value": "verify-ckeditor5.sh",
+        "description": "Runs the bundled verification script instead of describing a manual checklist the reader has to execute by hand"
       },
       {
         "type": "content_contains",
         "value": "ext_localconf",
-        "description": "Checks plugin registration"
+        "description": "Covers plugin registration as one of the checked points"
+      },
+      {
+        "type": "content_regex",
+        "value": "Configuration/RTE|\\.yaml|preset",
+        "description": "Covers the RTE preset, the second half of a working registration"
       }
     ]
   }
