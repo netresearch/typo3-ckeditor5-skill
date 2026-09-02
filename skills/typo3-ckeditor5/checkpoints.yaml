@@ -23,9 +23,17 @@
 #    substitution even inside a quoted grep pattern. Spell a literal `$(` for grep
 #    as the bracket expression `[$][(]`.
 #
-# Two spellings appear throughout because they carry the file's whole file-type
+# Three spellings appear throughout because they carry the file's whole file-type
 # vocabulary in one glob each: `*.y*ml` covers .yaml and .yml, `[Cc]keditor`
-# covers both directory spellings the precondition accepts.
+# covers both directory spellings the precondition accepts, and `*.[jt]s` covers
+# .js and .ts so a TypeScript-authored plugin is scanned by the same content
+# checks that gate a .js one — CK-07 accepted .ts while CK-08/09/12/13 read only
+# .js, so a .ts plugin passed the existence check with its jQuery use unscanned.
+#
+# In `-path`, `*` matches `/` as well (find(1): the metacharacters do not treat
+# `/` or `.` specially), so `*/JavaScript/[Cc]keditor*.[jt]s` reaches both
+# `JavaScript/Ckeditor/bundle.js` and `JavaScript/CkeditorFoo.js`. No trailing
+# `/*` variant is needed and adding one would drop the flat spelling.
 
 version: 1
 skill_id: typo3-ckeditor5
@@ -33,8 +41,14 @@ skill_id: typo3-ckeditor5
 preconditions:
   - type: file_exists
     target: ext_emconf.php
+  # Both branches name exactly the paths the checks below inspect. A wider
+  # precondition activates all 14 checks against a project none of them apply
+  # to: `*/RTE/*.y*ml` let `Documentation/RTE/example.yaml` in, and a bare
+  # `*/JavaScript/[Cc]keditor*` let any file under such a directory in — a
+  # README, an image. Measured on both: 14 checks ran, 8 failed, and not one
+  # of the failures was about the project.
   - type: command
-    pattern: "find . '(' -name .Build -o -name vendor -o -name node_modules ')' -prune -o -type f '(' -path '*/JavaScript/[Cc]keditor*' -o -path '*/RTE/*.y*ml' ')' -print | head -1 | grep -q ."
+    pattern: "find . -path '*/.Build/*' -prune -o -path '*/vendor/*' -prune -o -type f '(' -path '*/JavaScript/[Cc]keditor*.[jt]s' -o -path '*/Configuration/RTE/*.y*ml' ')' -print | grep -q ."
 
 mechanical:
   # === PLUGIN REGISTRATION ===
@@ -87,13 +101,13 @@ mechanical:
   # === NO JQUERY IN CKEDITOR CODE ===
   - id: CK-08
     type: command
-    pattern: "! find . '(' -name .Build -o -name vendor -o -name node_modules ')' -prune -o -type f -path '*/JavaScript/[Cc]keditor*.js' -print | xargs grep -l 'jquery' | grep -q ."
+    pattern: "! find . '(' -name .Build -o -name vendor -o -name node_modules ')' -prune -o -type f -path '*/JavaScript/[Cc]keditor*.[jt]s' -print | xargs grep -li 'jquery' | grep -q ."
     severity: error
     desc: "CKEditor 5 plugins must not import jQuery"
 
   - id: CK-09
     type: command
-    pattern: "! find . '(' -name .Build -o -name vendor -o -name node_modules ')' -prune -o -type f -path '*/JavaScript/[Cc]keditor*.js' -print | xargs grep -l '[$][(]' | grep -q ."
+    pattern: "! find . '(' -name .Build -o -name vendor -o -name node_modules ')' -prune -o -type f -path '*/JavaScript/[Cc]keditor*.[jt]s' -print | xargs grep -lE '([$]|jQuery)[(]' | grep -q ."
     severity: warning
     desc: "CKEditor 5 plugins should use native DOM APIs, not jQuery selectors"
 
@@ -114,14 +128,17 @@ mechanical:
   # === NO $.DEFERRED IN CKEditor CODE ===
   - id: CK-12
     type: command
-    pattern: "! find . '(' -name .Build -o -name vendor -o -name node_modules ')' -prune -o -type f -path '*/JavaScript/[Cc]keditor*.js' -print | xargs grep -l 'Deferred' | grep -q ."
+    pattern: "! find . '(' -name .Build -o -name vendor -o -name node_modules ')' -prune -o -type f -path '*/JavaScript/[Cc]keditor*.[jt]s' -print | xargs grep -l 'Deferred' | grep -q ."
     severity: warning
     desc: "CKEditor 5 plugins should use native Promise, not jQuery $.Deferred"
 
   # === NO FETCH WITH JQUERY ===
   - id: CK-13
     type: command
-    pattern: "! find . '(' -name .Build -o -name vendor -o -name node_modules ')' -prune -o -type f -path '*/JavaScript/[Cc]keditor*.js' -print | xargs grep -lE '[$][.](get|ajax|post)' | grep -q ."
+    pattern: |
+      ! find . '(' -name .Build -o -name vendor -o -name node_modules ')' -prune \
+          -o -type f -path '*/JavaScript/[Cc]keditor*.[jt]s' -print \
+        | xargs grep -lE '([$]|jQuery)[.](get|ajax|post)' | grep -q .
     severity: warning
     desc: "CKEditor 5 plugins should use native fetch(), not jQuery AJAX methods"
 
