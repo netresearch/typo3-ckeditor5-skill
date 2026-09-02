@@ -48,7 +48,7 @@ preconditions:
   # README, an image. Measured on both: 14 checks ran, 8 failed, and not one
   # of the failures was about the project.
   - type: command
-    pattern: "find . -path '*/.Build/*' -prune -o -path '*/vendor/*' -prune -o -type f '(' -path '*/JavaScript/[Cc]keditor*.[jt]s' -o -path '*/Configuration/RTE/*.y*ml' ')' -print | grep -q ."
+    pattern: 'find . \( -name .Build -o -name vendor -o -name node_modules \) -prune -o -type f \( -path "*/JavaScript/[Cc]keditor*.[jt]s" -o -path "*/Configuration/RTE/*.y*ml" \) -print | grep -q .'
 
 mechanical:
   # === PLUGIN REGISTRATION ===
