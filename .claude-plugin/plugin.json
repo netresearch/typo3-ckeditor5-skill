@@ -1,6 +1,6 @@
 {
   "name": "typo3-ckeditor5",
-  "version": "1.9.1",
+  "version": "1.9.2",
   "description": "CKEditor 5 development for TYPO3 v12+ with plugins and migration",
   "author": {
     "name": "Netresearch DTT GmbH",
