@@ -33,7 +33,19 @@ Add the [Netresearch marketplace](https://github.com/netresearch/claude-code-mar
 ```bash
 # Claude Code
 /plugin marketplace add netresearch/claude-code-marketplace
+/plugin install typo3-ckeditor5@netresearch-claude-code-marketplace
 ```
+
+### Without a marketplace
+
+Since Claude Code 2.1.157 a plugin directory under your personal skills directory loads on its own, hooks and commands included:
+
+```bash
+git clone https://github.com/netresearch/typo3-ckeditor5-skill.git \
+  ~/.claude/skills/typo3-ckeditor5
+```
+
+It loads as `typo3-ckeditor5@skills-dir` on the next session. Update with `git pull`; remove it by deleting the directory. This route has no `claude plugin update`.
 
 ### npx ([skills.sh](https://skills.sh))
 
