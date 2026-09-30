@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 #
 # tests/check-plugin-version.sh — behavioural tests for
 # Build/Scripts/check-plugin-version.sh and the Build/hooks/pre-push hook

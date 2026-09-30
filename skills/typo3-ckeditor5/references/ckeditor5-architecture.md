@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # CKEditor 5 Architecture Gotchas
 
 The public CKEditor 5 docs cover MVC architecture, schema syntax, conversion,

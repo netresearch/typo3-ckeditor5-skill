@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # TYPO3 CKEditor 5 Development Skill
 
 Expert patterns for CKEditor 5 integration in TYPO3, including custom plugin development, configuration, and migration from CKEditor 4.

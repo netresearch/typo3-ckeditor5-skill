@@ -1,4 +1,6 @@
 #!/bin/bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 # CKEditor 5 TYPO3 Integration Verification Script
 # Verifies CKEditor 5 plugin structure and configuration
 

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 #
 # tests/verify-ckeditor5.sh — behavioural tests for
 # skills/typo3-ckeditor5/scripts/verify-ckeditor5.sh.
