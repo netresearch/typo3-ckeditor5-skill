@@ -83,7 +83,7 @@ if [[ -n "$FOUND_JS_DIR" ]]; then
         echo "✅ Found $JS_FILES JavaScript file(s)"
 
         # Check for ES module patterns
-        for jsfile in $(find "$FOUND_JS_DIR" -name "*.js" 2>/dev/null); do
+        while IFS= read -r -d '' jsfile; do
             filename=$(basename "$jsfile")
             echo "   Checking: $filename"
 
@@ -112,7 +112,7 @@ if [[ -n "$FOUND_JS_DIR" ]]; then
                 echo "   ⚠️  No exports found - may not be loadable"
                 ((WARNINGS++))
             fi
-        done
+        done < <(find "$FOUND_JS_DIR" -name "*.js" -print0 2>/dev/null)
     else
         echo "⚠️  No JavaScript files found"
         ((WARNINGS++))
