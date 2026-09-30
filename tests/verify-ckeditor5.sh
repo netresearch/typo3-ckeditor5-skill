@@ -98,13 +98,15 @@ echo "empty directory"
 
 dir=$(fixture empty)
 run "$dir"
-expect_exit "a directory with nothing in it exits 0" 0
-expect_headers "every section runs after the first warning"
+expect_exit "a directory without ext_localconf.php exits 1" 1
+expect_headers "every section runs after the first finding"
 expect_line "missing RTE directory is a warning" "No Configuration/RTE directory found"
-expect_line "missing ext_localconf.php is a warning" "No ext_localconf.php found"
+expect_line "missing ext_localconf.php is an error" "❌ No ext_localconf.php found"
 expect_line "missing documentation is a warning" "No README.md or Documentation/Index.rst found"
-expect_line "three warnings are counted" "Warnings: 3"
-expect_line "three warnings still pass" "Verification PASSED"
+expect_line "the error is counted" "Errors: 1"
+expect_line "the other two findings are warnings" "Warnings: 2"
+expect_line "an error fails the run" "Verification FAILED"
+expect_no_line "an error does not pass" "Verification PASSED"
 
 echo "CKEditor 4 remnants"
 
@@ -209,6 +211,7 @@ dir=$(fixture weak)
 mkdir -p "$dir/Configuration/RTE" "$dir/Resources/Public/JavaScript/Ckeditor"
 printf 'custom:\n  embed: iframe\n' >"$dir/Configuration/RTE/Weak.yaml"
 printf 'console.log("plugin");\n' >"$dir/Resources/Public/JavaScript/Ckeditor/legacy.js"
+printf '<?php\n' >"$dir/ext_localconf.php"
 run "$dir"
 expect_exit "significant warnings still exit 0" 0
 expect_headers "every section runs"
@@ -219,7 +222,8 @@ expect_line "a JavaScript file without imports is a warning" "No ES module impor
 expect_line "a JavaScript file without exports is a warning" "No exports found - may not be loadable"
 expect_line "iframe without denyTags is a warning" "Weak.yaml: May allow dangerous tags without denyTags"
 expect_line "no TCA directory is only information" "No TCA directory found"
-expect_line "eight warnings are counted" "Warnings: 8"
+expect_line "no error is counted" "Errors: 0"
+expect_line "seven warnings are counted" "Warnings: 7"
 expect_line "more than three warnings are called significant" "Verification completed with significant warnings"
 expect_no_line "more than three warnings do not pass" "Verification PASSED"
 

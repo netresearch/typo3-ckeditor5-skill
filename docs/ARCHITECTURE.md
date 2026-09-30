@@ -21,7 +21,7 @@ The typo3-ckeditor5-skill is an AI agent skill that provides expert guidance for
 
 ### Verification Scripts (`skills/typo3-ckeditor5/scripts/`)
 
-- **verify-ckeditor5.sh**: Reads a TYPO3 extension directory (default: the current directory) and reports, by file presence and text search: RTE YAML presets and their `editor`, `processing` and toolbar sections, CKEditor JavaScript files (ES module imports, exports, `Plugin`/`Command` classes), stylesheets, preset and plugin registration in `ext_localconf.php`, RTE fields in TCA, CKEditor 4 remnants, and documentation. It does not parse YAML or JavaScript, so it cannot check schema definitions or converters. It prints a warning count and exits 0 when it completes.
+- **verify-ckeditor5.sh**: Reads a TYPO3 extension directory (default: the current directory) and reports, by file presence and text search: RTE YAML presets and their `editor`, `processing` and toolbar sections, CKEditor JavaScript files (ES module imports, exports, `Plugin`/`Command` classes), stylesheets, preset and plugin registration in `ext_localconf.php`, RTE fields in TCA, CKEditor 4 remnants, and documentation. It does not parse YAML or JavaScript, so it cannot check schema definitions or converters. A missing `ext_localconf.php` is an error and makes it exit 1, matching checkpoint CK-01 (severity `error`); every other finding is a warning or information, and with no error it exits 0.
 
 ### Evaluations (`evals/`)
 

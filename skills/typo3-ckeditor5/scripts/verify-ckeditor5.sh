@@ -162,8 +162,8 @@ if [[ -f "$EXTENSION_DIR/ext_localconf.php" ]]; then
         echo "ℹ️  No CKEditor 5 plugin registration in ext_localconf.php"
     fi
 else
-    echo "⚠️  No ext_localconf.php found"
-    WARNINGS=$((WARNINGS + 1))
+    echo "❌ No ext_localconf.php found (required to register RTE presets and CKEditor 5 plugins)"
+    ERRORS=$((ERRORS + 1))
 fi
 
 # Check for TCA with RTE configuration

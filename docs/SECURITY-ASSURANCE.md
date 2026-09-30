@@ -60,7 +60,7 @@ Which of these checks must pass before a pull request can merge is set in the br
 ## What a user cannot expect
 
 - The skill gives guidance; it does not enforce it. The agent writes code with the user's permissions; review what it proposes.
-- `verify-ckeditor5.sh` is a structure check by text search, not an audit of the RTE's HTML sanitisation. The `script`/`iframe`/`object` test is a substring match: a preset that mentions `description` or `objectives` triggers it, and a preset that allows those tags passes as long as it contains any `denyTags:` key. It exits 0 whenever it completes, whatever it found; its `Errors` count is never raised.
+- `verify-ckeditor5.sh` is a structure check by text search, not an audit of the RTE's HTML sanitisation. The `script`/`iframe`/`object` test is a substring match: a preset that mentions `description` or `objectives` triggers it, and a preset that allows those tags passes as long as it contains any `denyTags:` key. Its only error, which makes it exit 1, is a missing `ext_localconf.php`; every other finding, including a possibly dangerous preset, is a warning and leaves the exit code at 0.
 - The checkpoints run shell commands in the assessed project when an assessment tool executes them; run them only in projects you trust. The LLM review checkpoints (CK-20, CK-21) are judgements by a model and can miss issues.
 - `evals/run-ab-test.sh` sends the prompts in `evals/evals.json` to a paid model API through the `claude` CLI, capped at USD 0.50 per call, and trusts its argument, which it interpolates into a Python snippet as the eval index, and the contents of `evals.json`. It is a maintainer tool, not part of the skill.
 - The code examples in the references are starting points, not reviewed library code.
