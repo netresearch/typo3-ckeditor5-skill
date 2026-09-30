@@ -20,7 +20,8 @@ typo3-ckeditor5-skill/
 ├── .github/workflows/           # CI (lint, tests, eval-validate, security, harness-verify, release, …)
 ├── composer.json                # PHP package definition
 └── docs/                        # Architecture and planning docs
-    └── ARCHITECTURE.md          # Architecture overview
+    ├── ARCHITECTURE.md          # Architecture overview
+    └── SECURITY-ASSURANCE.md    # Security assurance case
 ```
 
 ## Commands
@@ -48,3 +49,4 @@ No Makefile or build scripts defined. Key operations:
 - [checkpoints.yaml](skills/typo3-ckeditor5/checkpoints.yaml) -- verification checkpoints
 - [references/](skills/typo3-ckeditor5/references/) -- architecture, integration, plugin dev, migration guides
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) -- architecture overview
+- [docs/SECURITY-ASSURANCE.md](docs/SECURITY-ASSURANCE.md) -- security assurance case: trust boundaries, threats, countermeasures and limits
