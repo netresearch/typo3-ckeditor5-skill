@@ -92,6 +92,36 @@ expect_line "its import is found" "Uses ES module imports"
 expect_line "its Plugin class is found" "Uses CKEditor 5 Plugin class"
 expect_line "no warning is raised" "Warnings: 0"
 
+echo "empty directory"
+
+dir=$(fixture empty)
+run "$dir"
+expect_exit "a directory with nothing in it exits 0" 0
+expect_headers "every section runs after the first warning"
+expect_line "missing RTE directory is a warning" "No Configuration/RTE directory found"
+expect_line "missing ext_localconf.php is a warning" "No ext_localconf.php found"
+expect_line "missing documentation is a warning" "No README.md or Documentation/Index.rst found"
+expect_line "three warnings are counted" "Warnings: 3"
+expect_line "three warnings still pass" "Verification PASSED"
+
+echo "CKEditor 4 remnants"
+
+dir=$(fixture cke4)
+mkdir -p "$dir/Configuration/RTE" "$dir/Configuration/TsConfig" "$dir/Resources/Public/JavaScript/Ckeditor"
+printf 'editor:\n  config:\n    toolbar: [bold]\n    extraPlugins: [old]\nprocessing:\n  allowTags: [p]\n' >"$dir/Configuration/RTE/Default.yaml"
+printf 'RTE.default.proc.allowTags = p\n' >"$dir/Configuration/TsConfig/Page.tsconfig"
+printf 'import { Plugin } from "@ckeditor/ckeditor5-core";\nCKEDITOR.plugins.add("x");\nexport default class X extends Plugin {}\n' >"$dir/Resources/Public/JavaScript/Ckeditor/x.js"
+printf '<?php\n' >"$dir/ext_localconf.php"
+printf '# Docs\n' >"$dir/README.md"
+run "$dir"
+expect_exit "several CKEditor 4 remnants still exit 0" 0
+expect_headers "every section runs"
+expect_line "CKEDITOR. global in JavaScript is reported" "Found CKEditor 4 global namespace usage in 1 file(s)"
+expect_line "extraPlugins in RTE YAML is reported" "Found CKEditor 4 configuration patterns in YAML"
+expect_line "RTE.default.proc in TsConfig is reported" "Found CKEditor 4 PageTSConfig patterns"
+expect_no_line "no all-clear when remnants exist" "No CKEditor 4 patterns detected"
+expect_line "each remnant counts as one warning" "Warnings: 3"
+
 echo
 if [ "$fail" -ne 0 ]; then
     echo "verify-ckeditor5: FAILED ($count checks)"

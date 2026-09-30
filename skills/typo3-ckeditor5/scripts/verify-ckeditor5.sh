@@ -29,14 +29,14 @@ if [[ -d "$EXTENSION_DIR/Configuration/RTE" ]]; then
                     echo "   ✅ Has 'editor' configuration"
                 else
                     echo "   ⚠️  Missing 'editor' section"
-                    ((WARNINGS++))
+                    WARNINGS=$((WARNINGS + 1))
                 fi
 
                 if grep -q "^processing:" "$yaml" 2>/dev/null; then
                     echo "   ✅ Has 'processing' configuration"
                 else
                     echo "   ⚠️  Missing 'processing' section (HTML sanitization)"
-                    ((WARNINGS++))
+                    WARNINGS=$((WARNINGS + 1))
                 fi
 
                 # Check for toolbar configuration
@@ -44,7 +44,7 @@ if [[ -d "$EXTENSION_DIR/Configuration/RTE" ]]; then
                     echo "   ✅ Has toolbar configuration"
                 else
                     echo "   ⚠️  Missing toolbar configuration"
-                    ((WARNINGS++))
+                    WARNINGS=$((WARNINGS + 1))
                 fi
 
                 # Check for importModules
@@ -55,11 +55,11 @@ if [[ -d "$EXTENSION_DIR/Configuration/RTE" ]]; then
         done
     else
         echo "⚠️  No YAML configuration files found in Configuration/RTE/"
-        ((WARNINGS++))
+        WARNINGS=$((WARNINGS + 1))
     fi
 else
     echo "⚠️  No Configuration/RTE directory found"
-    ((WARNINGS++))
+    WARNINGS=$((WARNINGS + 1))
 fi
 
 # Check for CKEditor JavaScript plugins
@@ -92,7 +92,7 @@ if [[ -n "$FOUND_JS_DIR" ]]; then
                 echo "   ✅ Uses ES module imports"
             else
                 echo "   ⚠️  No ES module imports found"
-                ((WARNINGS++))
+                WARNINGS=$((WARNINGS + 1))
             fi
 
             # Check for Plugin class pattern
@@ -110,12 +110,12 @@ if [[ -n "$FOUND_JS_DIR" ]]; then
                 echo "   ✅ Has exports"
             else
                 echo "   ⚠️  No exports found - may not be loadable"
-                ((WARNINGS++))
+                WARNINGS=$((WARNINGS + 1))
             fi
         done < <(find "$FOUND_JS_DIR" -name "*.js" -print0 2>/dev/null)
     else
         echo "⚠️  No JavaScript files found"
-        ((WARNINGS++))
+        WARNINGS=$((WARNINGS + 1))
     fi
 else
     echo "ℹ️  No CKEditor JavaScript directory found (optional)"
@@ -161,7 +161,7 @@ if [[ -f "$EXTENSION_DIR/ext_localconf.php" ]]; then
     fi
 else
     echo "⚠️  No ext_localconf.php found"
-    ((WARNINGS++))
+    WARNINGS=$((WARNINGS + 1))
 fi
 
 # Check for TCA with RTE configuration
@@ -194,8 +194,8 @@ if [[ -n "$FOUND_JS_DIR" ]]; then
     OLD_PATTERNS=$(grep -rl "CKEDITOR\." "$FOUND_JS_DIR" 2>/dev/null | wc -l)
     if [[ $OLD_PATTERNS -gt 0 ]]; then
         echo "⚠️  Found CKEditor 4 global namespace usage in $OLD_PATTERNS file(s)"
-        ((WARNINGS++))
-        ((CKE4_PATTERNS++))
+        WARNINGS=$((WARNINGS + 1))
+        CKE4_PATTERNS=$((CKE4_PATTERNS + 1))
     fi
 fi
 
@@ -204,8 +204,8 @@ if [[ -d "$EXTENSION_DIR/Configuration/RTE" ]]; then
     OLD_YAML=$(grep -rl "extraPlugins\|removePlugins\|allowedContent" "$EXTENSION_DIR/Configuration/RTE" 2>/dev/null | wc -l)
     if [[ $OLD_YAML -gt 0 ]]; then
         echo "⚠️  Found CKEditor 4 configuration patterns in YAML"
-        ((WARNINGS++))
-        ((CKE4_PATTERNS++))
+        WARNINGS=$((WARNINGS + 1))
+        CKE4_PATTERNS=$((CKE4_PATTERNS + 1))
     fi
 fi
 
@@ -214,8 +214,8 @@ if [[ -d "$EXTENSION_DIR/Configuration/TsConfig" ]] || [[ -d "$EXTENSION_DIR/Con
     OLD_TS=$(grep -rl "RTE.default.proc\|RTE.default.buttons" "$EXTENSION_DIR/Configuration" 2>/dev/null | wc -l)
     if [[ $OLD_TS -gt 0 ]]; then
         echo "⚠️  Found CKEditor 4 PageTSConfig patterns"
-        ((WARNINGS++))
-        ((CKE4_PATTERNS++))
+        WARNINGS=$((WARNINGS + 1))
+        CKE4_PATTERNS=$((CKE4_PATTERNS + 1))
     fi
 fi
 
@@ -246,7 +246,7 @@ if [[ -d "$EXTENSION_DIR/Configuration/RTE" ]]; then
                     echo "✅ $(basename "$yaml"): Has denyTags configuration"
                 else
                     echo "⚠️  $(basename "$yaml"): May allow dangerous tags without denyTags"
-                    ((WARNINGS++))
+                    WARNINGS=$((WARNINGS + 1))
                 fi
             fi
         fi
@@ -260,7 +260,7 @@ if [[ -f "$EXTENSION_DIR/README.md" ]] || [[ -f "$EXTENSION_DIR/Documentation/In
     echo "✅ Documentation found"
 else
     echo "⚠️  No README.md or Documentation/Index.rst found"
-    ((WARNINGS++))
+    WARNINGS=$((WARNINGS + 1))
 fi
 
 # Summary
