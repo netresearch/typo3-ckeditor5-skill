@@ -21,11 +21,16 @@ The typo3-ckeditor5-skill is an AI agent skill that provides expert guidance for
 
 ### Verification Scripts (`skills/typo3-ckeditor5/scripts/`)
 
-- **verify-ckeditor5.sh**: Validates a TYPO3 project's CKEditor 5 setup (plugin registration, schema definitions, converter completeness).
+- **verify-ckeditor5.sh**: Reads a TYPO3 extension directory (default: the current directory) and reports, by file presence and text search: RTE YAML presets and their `editor`, `processing` and toolbar sections, CKEditor JavaScript files (ES module imports, exports, `Plugin`/`Command` classes), stylesheets, preset and plugin registration in `ext_localconf.php`, RTE fields in TCA, CKEditor 4 remnants, and documentation. It does not parse YAML or JavaScript, so it cannot check schema definitions or converters. It prints a warning count and exits 0 when it completes.
 
 ### Evaluations (`evals/`)
 
-- Skill evaluation tests validating that the skill produces correct guidance.
+- `evals.json`: prompts with content assertions, validated by the Eval Validation workflow.
+- `run-ab-test.sh`: runs each prompt through the `claude` CLI with and without the skill and compares the assertions. It calls a paid model API and is not run in CI.
+
+### Tests (`tests/`)
+
+- Behavioural tests for `verify-ckeditor5.sh`, `Build/Scripts/check-plugin-version.sh` and `Build/hooks/pre-push`, run by `.github/workflows/tests.yml`.
 
 ## Key Concepts
 
@@ -43,4 +48,4 @@ TYPO3 YAML Preset → CKEditor 5 Config → Plugin Loading → Schema + Converte
 ## Integration
 
 - **composer.json**: Enables installation via Composer with `netresearch/composer-agent-skill-plugin`
-- **CI/CD**: GitHub Actions workflows handle linting and release automation
+- **CI/CD**: GitHub Actions workflows in `.github/workflows/` validate the skill and lint (`lint.yml`), validate the evals (`eval-validate.yml`), run the tests (`tests.yml`), scan for secrets, workflow issues, vulnerable dependencies and insecure code (`security.yml`), check the agent harness and template drift, score the repository with OpenSSF Scorecard, and publish signed releases (`release.yml`)

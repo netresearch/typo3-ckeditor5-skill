@@ -14,9 +14,10 @@ typo3-ckeditor5-skill/
 │   ├── checkpoints.yaml         # Verification checkpoints
 │   ├── scripts/                 # Verification scripts
 │   └── references/              # Reference guides (architecture, integration, migration)
+├── tests/                       # Behavioural tests for the scripts (tests.yml)
 ├── evals/                       # Skill evaluation tests
 ├── Build/                       # Build utilities
-├── .github/workflows/           # CI (lint.yml, release.yml, auto-merge-deps.yml)
+├── .github/workflows/           # CI (lint, tests, eval-validate, security, harness-verify, release, …)
 ├── composer.json                # PHP package definition
 └── docs/                        # Architecture and planning docs
     └── ARCHITECTURE.md          # Architecture overview
@@ -27,7 +28,8 @@ typo3-ckeditor5-skill/
 No Makefile or build scripts defined. Key operations:
 
 - Install PHP dependencies: run `composer` with `install`
-- Verify CKEditor 5 setup: `bash skills/typo3-ckeditor5/scripts/verify-ckeditor5.sh`
+- Verify CKEditor 5 setup of an extension: `bash skills/typo3-ckeditor5/scripts/verify-ckeditor5.sh <extension-dir>` (default: current directory)
+- Run the tests: `bash tests/verify-ckeditor5.sh` and `bash tests/check-plugin-version.sh`
 - Verify harness maturity: `bash scripts/verify-harness.sh --format=text --status`
 
 ## Rules

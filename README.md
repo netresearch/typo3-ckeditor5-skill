@@ -96,14 +96,20 @@ Example queries:
 
 ```
 typo3-ckeditor5-skill/
-├── SKILL.md                              # Skill metadata and core patterns
-├── references/
-│   ├── ckeditor5-architecture.md         # CKEditor 5 gotchas (figcaption, view vs DOM)
-│   ├── typo3-integration.md              # TYPO3-specific integration patterns
-│   ├── plugin-development.md             # TYPO3 plugin wiring and gotchas
-│   └── migration-guide.md                # CKEditor 4 to 5 migration
-└── scripts/
-    └── verify-ckeditor5.sh               # Verification script
+├── skills/typo3-ckeditor5/
+│   ├── SKILL.md                          # Skill metadata and core patterns
+│   ├── checkpoints.yaml                  # CK-XX checkpoints for assessment tools
+│   ├── references/
+│   │   ├── ckeditor5-architecture.md     # CKEditor 5 gotchas (figcaption, view vs DOM)
+│   │   ├── typo3-integration.md          # TYPO3-specific integration patterns
+│   │   ├── plugin-development.md         # TYPO3 plugin wiring and gotchas
+│   │   └── migration-guide.md            # CKEditor 4 to 5 migration
+│   └── scripts/
+│       └── verify-ckeditor5.sh           # Verification script
+├── tests/                                # Behavioural tests for the scripts
+├── evals/                                # Skill evaluation suite and A/B runner
+├── Build/                                # Version check and pre-push hook
+└── docs/                                 # Architecture and security assurance case
 ```
 
 ## Expertise Areas
