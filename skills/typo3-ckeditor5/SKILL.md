@@ -1,4 +1,6 @@
 ---
+# SPDX-License-Identifier: CC-BY-SA-4.0
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 name: typo3-ckeditor5
 description: "Use when developing CKEditor 5 custom plugins for TYPO3 v12+ (v14.3 LTS bundles CKE5 v47; v13 shipped 41-42), configuring RTE presets, migrating from CKEditor 4, customizing toolbars, dark/light-mode context (on by default in v14, #106964), or fixing rich text editing issues. Triggers: CKE5, RTE config, YAML preset, editor plugin, jQuery removal, backend JS, CKEditor 47."
 ---

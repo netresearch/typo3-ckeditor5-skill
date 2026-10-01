@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # TYPO3 CKEditor 5 Skill
 
 Expert patterns for CKEditor 5 integration in TYPO3: custom plugin development, RTE configuration, and CKEditor 4 to 5 migration.
@@ -11,12 +14,14 @@ typo3-ckeditor5-skill/
 │   ├── checkpoints.yaml         # Verification checkpoints
 │   ├── scripts/                 # Verification scripts
 │   └── references/              # Reference guides (architecture, integration, migration)
+├── tests/                       # Behavioural tests for the scripts (tests.yml)
 ├── evals/                       # Skill evaluation tests
 ├── Build/                       # Build utilities
-├── .github/workflows/           # CI (lint.yml, release.yml, auto-merge-deps.yml)
+├── .github/workflows/           # CI (lint, tests, eval-validate, security, harness-verify, release, …)
 ├── composer.json                # PHP package definition
 └── docs/                        # Architecture and planning docs
-    └── ARCHITECTURE.md          # Architecture overview
+    ├── ARCHITECTURE.md          # Architecture overview
+    └── SECURITY-ASSURANCE.md    # Security assurance case
 ```
 
 ## Commands
@@ -24,7 +29,8 @@ typo3-ckeditor5-skill/
 No Makefile or build scripts defined. Key operations:
 
 - Install PHP dependencies: run `composer` with `install`
-- Verify CKEditor 5 setup: `bash skills/typo3-ckeditor5/scripts/verify-ckeditor5.sh`
+- Verify CKEditor 5 setup of an extension: `bash skills/typo3-ckeditor5/scripts/verify-ckeditor5.sh <extension-dir>` (default: current directory)
+- Run the tests: `bash tests/verify-ckeditor5.sh` and `bash tests/check-plugin-version.sh`
 - Verify harness maturity: `bash scripts/verify-harness.sh --format=text --status`
 
 ## Rules
@@ -43,3 +49,4 @@ No Makefile or build scripts defined. Key operations:
 - [checkpoints.yaml](skills/typo3-ckeditor5/checkpoints.yaml) -- verification checkpoints
 - [references/](skills/typo3-ckeditor5/references/) -- architecture, integration, plugin dev, migration guides
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) -- architecture overview
+- [docs/SECURITY-ASSURANCE.md](docs/SECURITY-ASSURANCE.md) -- security assurance case: trust boundaries, threats, countermeasures and limits

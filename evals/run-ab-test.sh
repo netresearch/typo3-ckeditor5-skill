@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 # A/B eval runner: WITHOUT skill vs WITH skill
 # Usage: ./evals/run-ab-test.sh [eval-index|all]
 set -euo pipefail

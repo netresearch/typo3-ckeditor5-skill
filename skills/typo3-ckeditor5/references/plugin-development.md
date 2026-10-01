@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # CKEditor 5 Plugin Development for TYPO3
 
 For plugin scaffolding (class structure, schema, converters, commands,

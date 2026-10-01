@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # CKEditor 5 TYPO3 Integration
 
 ## Overview
@@ -480,7 +483,7 @@ Example: `t3://page?uid=1 _blank link-class "Link Title" &L=1&type=123`
 | Position | Parameter | Description |
 |----------|-----------|-------------|
 | 1 | URL | Link target (t3://page, https://, file:...) |
-| 2 | Target | Window target (_blank, _self, _top, _parent) |
+| 2 | Target | Window target (`_blank`, `_self`, `_top`, `_parent`) |
 | 3 | Class | CSS class for the link element |
 | 4 | Title | Link title (must be quoted if contains spaces) |
 | 5 | Params | Additional URL parameters (&L=1&type=123) |
