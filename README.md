@@ -150,7 +150,7 @@ bash tests/verify-ckeditor5.sh      # skills/typo3-ckeditor5/scripts/verify-cked
 bash tests/check-plugin-version.sh  # Build/Scripts/check-plugin-version.sh and Build/hooks/pre-push
 ```
 
-- `tests/verify-ckeditor5.sh` builds fixture extension directories (empty, complete, with empty configuration directories, with a weak preset and plugin, with CKEditor 4 remnants, with a file name containing a space) and checks the verifier's exit code, that every section runs, the individual findings and the exact warning count.
+- `tests/verify-ckeditor5.sh` builds fixture extension directories (empty, complete, with empty configuration directories, with a weak preset and plugin, with CKEditor 4 remnants, with four warnings to pin the significant-warnings threshold, with a file name containing a space) and checks the verifier's exit code, that every section runs, the individual findings and the exact warning count.
 - `tests/check-plugin-version.sh` builds throwaway git repositories and checks that a semver tag at `HEAD` must match the version in `.claude-plugin/plugin.json`, and that the pre-push hook passes the result on.
 
 Each check prints `ok` or `FAIL`; a `FAIL` line names the expectation that was not met and is followed by the script's output. A test file exits 1 when any check failed. In CI, the Skill Tests workflow (`.github/workflows/tests.yml`) runs every `tests/**/*.sh` on each pull request and on pushes to `main`, and fails when the repository ships scripts under `skills/*/scripts/` but no test ran.
