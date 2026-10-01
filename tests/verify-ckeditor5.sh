@@ -125,6 +125,18 @@ expect_line "extraPlugins in RTE YAML is reported" "Found CKEditor 4 configurati
 expect_line "RTE.default.proc in TsConfig is reported" "Found CKEditor 4 PageTSConfig patterns"
 expect_no_line "no all-clear when remnants exist" "No CKEditor 4 patterns detected"
 expect_line "each remnant counts as one warning" "Warnings: 3"
+expect_line "three warnings still pass" "Verification PASSED"
+
+echo "four warnings"
+
+dir=$(fixture four)
+cp -R "$WORK/cke4/." "$dir/"
+printf 'import { Plugin } from "@ckeditor/ckeditor5-core";\n' >"$dir/Resources/Public/JavaScript/Ckeditor/y.js"
+run "$dir"
+expect_exit "four warnings still exit 0" 0
+expect_line "a JavaScript file without exports adds the fourth warning" "Warnings: 4"
+expect_line "four warnings are called significant" "Verification completed with significant warnings"
+expect_no_line "four warnings do not pass" "Verification PASSED"
 
 echo "complete extension"
 
