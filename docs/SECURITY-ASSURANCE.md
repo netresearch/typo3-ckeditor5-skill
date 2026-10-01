@@ -13,7 +13,8 @@ This document states what a user can expect from this repository in terms of sec
 | Verification script | `skills/typo3-ckeditor5/scripts/verify-ckeditor5.sh` | On the user's machine, against a directory the user names. |
 | Checkpoints | `skills/typo3-ckeditor5/checkpoints.yaml` | Only when an assessment tool runs its `command` patterns in a user's project. |
 | Evaluation runner | `evals/run-ab-test.sh`, `evals/evals.json` | On a maintainer's machine, by hand; it calls the `claude` CLI. |
-| Repository checks | `Build/Scripts/check-plugin-version.sh`, `Build/hooks/pre-push`, `scripts/verify-harness.sh`, `tests/*.sh` | In this repository's CI and on contributors' machines. |
+| Repository checks | `Build/Scripts/check-plugin-version.sh`, `Build/hooks/pre-push`, `tests/*.sh` | In this repository's CI and on contributors' machines. |
+| Harness check | `scripts/verify-harness.sh` | On contributors' machines; CI only lints it with ShellCheck. |
 
 The repository ships no server component, no container image and no PHP or JavaScript code that runs in a TYPO3 installation. The code examples in the references are examples; they run only after someone copies them into an extension. The repository stores nothing and handles no accounts or credentials.
 
