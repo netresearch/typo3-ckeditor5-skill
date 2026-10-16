@@ -403,7 +403,7 @@
   },
   {
     "name": "rte-strip-table-styles-on-save",
-    "prompt": "Editors paste tables from Word into the TYPO3 v13 RTE. The stored HTML keeps style, width and height attributes on table, td and th. Configure the CKEditor 5 preset so these attributes are removed when the record is saved, without losing any other markup.",
+    "prompt": "Editors paste tables from Word into the TYPO3 v13/v14 RTE. The stored HTML keeps style, width and height attributes on table, td and th. Configure the CKEditor 5 preset so these attributes are removed when the record is saved, without losing any other markup.",
     "assertions": [
       {
         "type": "content_contains",
