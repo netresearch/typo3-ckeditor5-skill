@@ -219,6 +219,26 @@ imports:
   - { resource: 'EXT:rte_ckeditor/Configuration/RTE/Editor/Plugins.yaml' }
 ```
 
+**The alignment dropdown always offers justify.** `CKEditor5Migrator::handleAlignmentPlugin()`
+rebuilds `alignment.options` with all four entries (left, center, right,
+justify); a custom `options` list only changes the class names. To offer fewer
+alignments, use single buttons instead of the `alignment` dropdown:
+
+```yaml
+editor:
+  config:
+    toolbar:
+      items:
+        - alignment:left
+        - alignment:center
+        - alignment:right
+    alignment:
+      options:
+        - { name: 'left', className: 'text-start' }
+        - { name: 'center', className: 'text-center' }
+        - { name: 'right', className: 'text-end' }
+```
+
 ## PHP Registration
 
 ### Preset Registration
