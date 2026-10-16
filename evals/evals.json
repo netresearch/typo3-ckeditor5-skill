@@ -400,5 +400,33 @@
         "description": "Covers the RTE preset, the second half of a working registration"
       }
     ]
+  },
+  {
+    "name": "rte-strip-table-styles-on-save",
+    "prompt": "Editors paste tables from Word into the TYPO3 v13 RTE. The stored HTML keeps style, width and height attributes on table, td and th. Configure the CKEditor 5 preset so these attributes are removed when the record is saved, without losing any other markup.",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "exitHTMLparser_db",
+        "description": "Uses exitHTMLparser_db, the parser that sees block elements like <table>"
+      },
+      {
+        "type": "content_regex",
+        "value": "keepNonMatchedTags:\\s*1",
+        "description": "Keeps non-matched tags so the rest of the markup survives"
+      },
+      {
+        "type": "content_regex",
+        "value": "fixAttrib:[\\s\\S]*unset",
+        "description": "Unsets the attributes via fixAttrib"
+      }
+    ],
+    "samples": {
+      "passing": "processing:\n  exitHTMLparser_db:\n    keepNonMatchedTags: 1\n    tags:\n      table:\n        fixAttrib:\n          style: { unset: 1 }\n          width: { unset: 1 }",
+      "failing": [
+        "processing:\n  HTMLparser_db:\n    tags:\n      table:\n        fixAttrib:\n          style: { unset: 1 }\n          width: { unset: 1 }",
+        "processing:\n  exitHTMLparser_db:\n    keepNonMatchedTags: 0"
+      ]
+    }
   }
 ]
