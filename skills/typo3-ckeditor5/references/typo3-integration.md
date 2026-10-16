@@ -204,6 +204,21 @@ processing:
     - embed
 ```
 
+### Preset Pitfalls
+
+**Do not import the core `Default.yaml` into a custom preset.** YAML imports
+merge lists by appending (`ArrayUtility::replaceAndAppendScalarValuesRecursive`),
+so your `toolbar.items`, `heading.options` and `style.definitions` are added to
+the core ones instead of replacing them. Import the building blocks the core
+`Default.yaml` itself uses and define the lists yourself:
+
+```yaml
+imports:
+  - { resource: 'EXT:rte_ckeditor/Configuration/RTE/Processing.yaml' }
+  - { resource: 'EXT:rte_ckeditor/Configuration/RTE/Editor/Base.yaml' }
+  - { resource: 'EXT:rte_ckeditor/Configuration/RTE/Editor/Plugins.yaml' }
+```
+
 ## PHP Registration
 
 ### Preset Registration
