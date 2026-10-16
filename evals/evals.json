@@ -417,8 +417,8 @@
       },
       {
         "type": "content_regex",
-        "value": "fixAttrib:[\\s\\S]*unset",
-        "description": "Unsets the attributes via fixAttrib"
+        "value": "(style|width):[[:space:]]*\\{[[:space:]]*unset",
+        "description": "Unsets the attributes via fixAttrib (style/width: { unset: 1 })"
       }
     ],
     "samples": {
