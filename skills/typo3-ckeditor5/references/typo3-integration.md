@@ -760,6 +760,52 @@ $GLOBALS['TYPO3_CONF_VARS']['BE']['debug'] = true;
 // Look under: $GLOBALS['TYPO3_CONF_VARS']['RTE']
 ```
 
+### Inspecting the Effective Configuration
+
+Imports, list merging and the `CKEditor5Migrator` change the preset before it
+reaches the browser. To see what the editor really gets, run a small CLI script
+inside the project (e.g. in the PHP container) after bootstrapping TYPO3. The
+database must be reachable, because the preset is resolved via Page TSconfig:
+
+```php
+<?php
+// var/rte-debug.php - delete after use
+use TYPO3\CMS\Core\Core\Bootstrap;
+use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\NullLogger;
+use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Configuration\Loader\YamlFileLoader;
+use TYPO3\CMS\Core\Configuration\Richtext;
+use TYPO3\CMS\Core\TypoScript\TypoScriptService;
+use TYPO3\CMS\RteCKEditor\Configuration\CKEditor5Migrator;
+
+$classLoader = require __DIR__ . '/../vendor/autoload.php';
+SystemEnvironmentBuilder::run(0, SystemEnvironmentBuilder::REQUESTTYPE_CLI);
+$container = Bootstrap::init($classLoader);
+
+// Richtext is a private service, so build it by hand. It resolves imports
+// and converts the YAML preset as the FormEngine does.
+$richtext = new Richtext(
+    $container->get(EventDispatcherInterface::class),
+    $container->get(CacheManager::class)->getCache('runtime'),
+    new YamlFileLoader(new NullLogger()),
+    new TypoScriptService(),
+);
+$conf = $richtext->getConfiguration('tt_content', 'bodytext', 1, 'text', [
+    'richtextConfiguration' => 'my_preset',
+]);
+
+// Applies the same migrations as the backend before rendering the editor
+$conf = (new CKEditor5Migrator($conf))->get();
+print_r($conf['editor']['config']['toolbar']['items']);
+print_r($conf['editor']['config']['alignment'] ?? null);
+```
+
+To test processing rules, pass the converted `proc.` configuration to
+`RteHtmlParser::transformTextForPersistence($html, $procConfig)` and compare the
+stored HTML with your input.
+
 ### JavaScript Debugging
 
 ```javascript
