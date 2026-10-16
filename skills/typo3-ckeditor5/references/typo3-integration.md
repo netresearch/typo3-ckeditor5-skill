@@ -392,20 +392,46 @@ processing:
   allowAttributes:
     - { attribute: 'data-*', elements: '*' }
 
-  # Custom transformations
-  HTMLparser_db:
-    # Settings applied when saving to database
-    allowTags: 'p,br,strong,em,a,ul,ol,li'
-    denyTags: 'script,style'
-
   HTMLparser_rte:
     # Settings applied when loading into RTE
     stripEmptyTags: 1
 
+  # Last pass before the content is stored: strip table sizes pasted from Word
   exitHTMLparser_db:
-    # Settings after processing for database
-    keepNonMatchedTags: 0
+    keepNonMatchedTags: 1   # keep every tag not listed under tags
+    tags:
+      table:
+        fixAttrib:
+          style: { unset: 1 }
+          width: { unset: 1 }
+          height: { unset: 1 }
+      td:
+        fixAttrib:
+          style: { unset: 1 }
+          width: { unset: 1 }
+      th:
+        fixAttrib:
+          style: { unset: 1 }
+          width: { unset: 1 }
 ```
+
+Which parser sees which tag (verified on TYPO3 v14 with the core `Processing.yaml`):
+
+- `HTMLparser_db` runs inside `TS_transform_db` on the content *between* block
+  elements only. `<table>`, `<ul>`, `<blockquote>` and other block elements pass
+  through untouched, so `HTMLparser_db.tags.table.fixAttrib` never fires.
+- `exitHTMLparser_db` runs on the whole document. Use it for attribute cleanup
+  that has to reach block elements.
+- `keepNonMatchedTags: 0` removes every tag that is not listed under `tags`.
+  Without a `tags` list it turns `<p>Hi <strong>x</strong></p>` into `Hi x`,
+  i.e. it strips all markup on save. Use `keepNonMatchedTags: 1` unless you list
+  every allowed tag.
+- No extra switch is needed: the YAML-to-TypoScript conversion in `Richtext`
+  sets `exitHTMLparser_db = 1` for every array key it converts.
+
+In the editor, `htmlSupport.disallow` keeps pasted styles out of the model; the
+`exitHTMLparser_db` rule is the safety net for content saved through source
+editing or imports.
 
 ### PHP Processing Hook
 
