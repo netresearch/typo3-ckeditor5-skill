@@ -204,6 +204,41 @@ processing:
     - embed
 ```
 
+### Preset Pitfalls
+
+**Do not import the core `Default.yaml` into a custom preset.** YAML imports
+merge lists by appending (`ArrayUtility::replaceAndAppendScalarValuesRecursive`),
+so your `toolbar.items`, `heading.options` and `style.definitions` are added to
+the core ones instead of replacing them. Import the building blocks the core
+`Default.yaml` itself uses and define the lists yourself:
+
+```yaml
+imports:
+  - { resource: 'EXT:rte_ckeditor/Configuration/RTE/Processing.yaml' }
+  - { resource: 'EXT:rte_ckeditor/Configuration/RTE/Editor/Base.yaml' }
+  - { resource: 'EXT:rte_ckeditor/Configuration/RTE/Editor/Plugins.yaml' }
+```
+
+**The alignment dropdown always offers justify.** `CKEditor5Migrator::handleAlignmentPlugin()`
+rebuilds `alignment.options` with all four entries (left, center, right,
+justify); a custom `options` list only changes the class names. To offer fewer
+alignments, use single buttons instead of the `alignment` dropdown:
+
+```yaml
+editor:
+  config:
+    toolbar:
+      items:
+        - alignment:left
+        - alignment:center
+        - alignment:right
+    alignment:
+      options:
+        - { name: 'left', className: 'text-start' }
+        - { name: 'center', className: 'text-center' }
+        - { name: 'right', className: 'text-end' }
+```
+
 ## PHP Registration
 
 ### Preset Registration
@@ -392,20 +427,46 @@ processing:
   allowAttributes:
     - { attribute: 'data-*', elements: '*' }
 
-  # Custom transformations
-  HTMLparser_db:
-    # Settings applied when saving to database
-    allowTags: 'p,br,strong,em,a,ul,ol,li'
-    denyTags: 'script,style'
-
   HTMLparser_rte:
     # Settings applied when loading into RTE
     stripEmptyTags: 1
 
+  # Last pass before the content is stored: strip table sizes pasted from Word
   exitHTMLparser_db:
-    # Settings after processing for database
-    keepNonMatchedTags: 0
+    keepNonMatchedTags: 1   # keep every tag not listed under tags
+    tags:
+      table:
+        fixAttrib:
+          style: { unset: 1 }
+          width: { unset: 1 }
+          height: { unset: 1 }
+      td:
+        fixAttrib:
+          style: { unset: 1 }
+          width: { unset: 1 }
+      th:
+        fixAttrib:
+          style: { unset: 1 }
+          width: { unset: 1 }
 ```
+
+Which parser sees which tag (verified on TYPO3 v14 with the core `Processing.yaml`):
+
+- `HTMLparser_db` runs inside `TS_transform_db` on the content *between* block
+  elements only. `<table>`, `<ul>`, `<blockquote>` and other block elements pass
+  through untouched, so `HTMLparser_db.tags.table.fixAttrib` never fires.
+- `exitHTMLparser_db` runs on the whole document. Use it for attribute cleanup
+  that has to reach block elements.
+- `keepNonMatchedTags: 0` removes every tag that is not listed under `tags`.
+  Without a `tags` list it turns `<p>Hi <strong>x</strong></p>` into `Hi x`,
+  i.e. it strips all markup on save. Use `keepNonMatchedTags: 1` unless you list
+  every allowed tag.
+- No extra switch is needed: the YAML-to-TypoScript conversion in `Richtext`
+  sets `exitHTMLparser_db = 1` for every array key it converts.
+
+In the editor, `htmlSupport.disallow` keeps pasted styles out of the model; the
+`exitHTMLparser_db` rule is the safety net for content saved through source
+editing or imports.
 
 ### PHP Processing Hook
 
@@ -698,6 +759,52 @@ $GLOBALS['TYPO3_CONF_VARS']['BE']['debug'] = true;
 // Access: /typo3/module/tools/configuration
 // Look under: $GLOBALS['TYPO3_CONF_VARS']['RTE']
 ```
+
+### Inspecting the Effective Configuration
+
+Imports, list merging and the `CKEditor5Migrator` change the preset before it
+reaches the browser. To see what the editor really gets, run a small CLI script
+inside the project (e.g. in the PHP container) after bootstrapping TYPO3. The
+database must be reachable, because the preset is resolved via Page TSconfig:
+
+```php
+<?php
+// var/rte-debug.php - delete after use
+use TYPO3\CMS\Core\Core\Bootstrap;
+use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\NullLogger;
+use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Configuration\Loader\YamlFileLoader;
+use TYPO3\CMS\Core\Configuration\Richtext;
+use TYPO3\CMS\Core\TypoScript\TypoScriptService;
+use TYPO3\CMS\RteCKEditor\Configuration\CKEditor5Migrator;
+
+$classLoader = require __DIR__ . '/../vendor/autoload.php';
+SystemEnvironmentBuilder::run(0, SystemEnvironmentBuilder::REQUESTTYPE_CLI);
+$container = Bootstrap::init($classLoader);
+
+// Richtext is a private service, so build it by hand. It resolves imports
+// and converts the YAML preset as the FormEngine does.
+$richtext = new Richtext(
+    $container->get(EventDispatcherInterface::class),
+    $container->get(CacheManager::class)->getCache('runtime'),
+    new YamlFileLoader(new NullLogger()),
+    new TypoScriptService(),
+);
+$conf = $richtext->getConfiguration('tt_content', 'bodytext', 1, 'text', [
+    'richtextConfiguration' => 'my_preset',
+]);
+
+// Applies the same migrations as the backend before rendering the editor
+$conf = (new CKEditor5Migrator($conf))->get();
+print_r($conf['editor']['config']['toolbar']['items']);
+print_r($conf['editor']['config']['alignment'] ?? null);
+```
+
+To test processing rules, pass the converted `proc.` configuration to
+`RteHtmlParser::transformTextForPersistence($html, $procConfig)` and compare the
+stored HTML with your input.
 
 ### JavaScript Debugging
 
